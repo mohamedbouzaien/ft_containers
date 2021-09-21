@@ -6,7 +6,7 @@
 /*   By: mbouzaie <mbouzaie@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/09 12:46:15 by mbouzaie          #+#    #+#             */
-/*   Updated: 2021/09/18 19:03:01 by mbouzaie         ###   ########.fr       */
+/*   Updated: 2021/09/21 15:54:51 by mbouzaie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,6 +123,8 @@ int     main()
 	//vectorTest_AssignRange(v4);
 	v4.push_back(10);
 	v4.push_back(20);
+    std::cout << std::endl;
+    std::cout << v4.size() << std::endl;
 	vectorTest_PushBack(v4);
 	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: mbouzaie <mbouzaie@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/19 11:48:08 by mbouzaie          #+#    #+#             */
-/*   Updated: 2021/09/18 18:17:38 by mbouzaie         ###   ########.fr       */
+/*   Updated: 2021/09/21 18:13:29 by mbouzaie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,10 +81,11 @@ namespace ft
 					typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = 0)
 			: _alloc(alloc)
 			{
-				this->_front = this->_alloc.allocate(static_cast<size_type>(last - first));
-				this->_capacity = this->_front + static_cast<size_type>(last - first);
+				size_type	n = last - first;
+				this->_front = this->_alloc.allocate(n);
+				this->_capacity = this->_front + n;
 				this->_back = this->_front;
-				for (size_type i = 0; i < static_cast<size_type>(last - first); i++)
+				for (size_type i = 0; i < n; i++)
 				{
 					this->_alloc.construct(this->_back, *first++);
 					this->_back++;
@@ -191,7 +192,7 @@ namespace ft
 					throw std::length_error("vector::_M_resize");
 				if (n < size)
 				{
-					while (n < size)
+					while (n < this->size())
 					{
 						--this->_back;
 						this->_alloc.destroy(this->_back);
@@ -238,10 +239,10 @@ namespace ft
 					this->_back = this->_front;
 					for (size_type i = 0; i < prev_size; i++)
 					{
-						this->_alloc.construct(this->_back, *prev_front);
+						this->_alloc.construct(this->_back, *prev_front++);
 						this->_back++;
 					}
-					this->_alloc.deallocate(prev_front, prev_capacity);
+					this->_alloc.deallocate(prev_front - prev_size, prev_capacity);
 					this->_capacity = this->_front + n;
 				}
 			};

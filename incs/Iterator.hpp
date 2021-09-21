@@ -6,7 +6,7 @@
 /*   By: mbouzaie <mbouzaie@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/22 20:57:56 by mbouzaie          #+#    #+#             */
-/*   Updated: 2021/09/18 18:14:21 by mbouzaie         ###   ########.fr       */
+/*   Updated: 2021/09/21 18:55:20 by mbouzaie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -295,7 +295,7 @@ namespace ft
 
 			reverse_iterator&	operator++()
 			{
-				this->_it++;
+				--this->_it;
 				return (*this);
 			};
 
@@ -310,7 +310,7 @@ namespace ft
 
 			reverse_iterator&	operator--()
 			{
-				this->_it--;
+				++this->_it;
 				return (*this);
 			};
 
@@ -324,23 +324,23 @@ namespace ft
 
 			reverse_iterator	operator+(difference_type n)	const
 			{
-				return (reverse_iterator(this->_it + n));
+				return (reverse_iterator(this->_it - n));
 			};
 
 			reverse_iterator	operator-(difference_type n)	const
 			{
-				return (reverse_iterator(this->_it - n));
+				return (reverse_iterator(this->_it + n));
 			};
 
 			reverse_iterator&	operator+=(difference_type n)
 			{
-				this->_it += n;
+				this->_it -= n;
 				return (*this);
 			};
 
 			reverse_iterator&	operator-=(difference_type n)
 			{
-				this->_it -= n;
+				this->_it += n;
 				return (*this);
 			};
 	};
