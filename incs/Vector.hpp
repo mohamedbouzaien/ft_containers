@@ -1,37 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Vector.hpp                                         :+:      :+:    :+:   */
+/*   vector.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mbouzaie <mbouzaie@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/19 11:48:08 by mbouzaie          #+#    #+#             */
-/*   Updated: 2021/09/21 18:13:29 by mbouzaie         ###   ########.fr       */
+/*   Updated: 2021/09/30 00:15:58 by mbouzaie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef _VECTOR_HPP
-# define _VECTOR_HPP
+#ifndef VECTOR_HPP
+# define VECTOR_HPP
 # include <memory>
-# include "Iterator.hpp"
+# include "iterator.hpp"
 # include "type_traits.hpp"
 # include "algorithm.hpp"
 namespace ft
-{
-	
-
-	template <bool, typename T = void>
-	struct enable_if
-	{
-
-	};
-
-	template <typename T		>
-	struct enable_if<true, T>
-	{
-		typedef T type;
-	};
-	
+{	
 	template < class T, class Allocator = std::allocator<T> >
 	class vector
 	{
@@ -337,44 +323,217 @@ namespace ft
 
 			iterator				insert(iterator position, const value_type &val)
 			{
-				//work
+				pointer		prev_front;
+				pointer		prev_back;
+				size_type	prev_size;
+				size_type	prev_capacity;
+				iterator	it;
+
+				if (this->_capacity == this->_back)		
+				{
+					prev_front = this->_front;
+					prev_back = this->_back;
+					prev_size = this->size();
+					prev_capacity = this->capacity();
+					this->_front = this->_alloc.allocate(prev_size + 2);
+					this->_back = this->_front;
+					for (size_type i = 0; i < prev_size; i++)
+					{
+						if (prev_front == &(*position))
+							position = iterator(this->_back);
+						this->_alloc.construct(this->_back, *prev_front++);
+						this->_back++;
+					}
+					if (prev_front == &(*position))
+						position = iterator(this->_back);
+					this->_alloc.deallocate(prev_front - prev_size, prev_capacity);
+					this->_capacity = this->_front + prev_size + 1;
+				}
+				if (position.base() == 0)
+					position = iterator(this->_back);
+				it = iterator(this->_capacity);
+				if (this->size() > 0 && position != this->end())
+				{
+					while (it != position)
+					{
+						this->_alloc.construct(&(*(it)), *(it - 1));
+						this->_alloc.destroy(&(*(it - 1)));
+						it--;
+					}
+				}
 				this->_alloc.construct(&(*position), val);
+				this->_back++;
 				return (position);
 			};
 
 			void					insert(iterator position, size_type n, const value_type &val)
 			{
-				//work
-				this->_alloc.construct(&(*position), val);
-				(void)n;
+				pointer		prev_front;
+				pointer		prev_back;
+				size_type	prev_size;
+				size_type	prev_capacity;
+				iterator	it;
+
+				if (this->_capacity == this->_back)		
+				{
+					prev_front = this->_front;
+					prev_back = this->_back;
+					prev_size = this->size();
+					prev_capacity = this->capacity();
+					this->_front = this->_alloc.allocate(prev_size + n + 1);
+					this->_back = this->_front;
+					for (size_type i = 0; i < prev_size; i++)
+					{
+						if (prev_front == &(*position))
+							position = iterator(this->_back);
+						this->_alloc.construct(this->_back, *prev_front++);
+						this->_back++;
+					}
+					if (prev_front == &(*position))
+						position = iterator(this->_back);
+					this->_alloc.deallocate(prev_front - prev_size, prev_capacity);
+					this->_capacity = this->_front + prev_size + n;
+				}
+				if (position.base() == 0)
+					position = iterator(this->_back);
+
+				if (this->size() > 0 && position != this->end())
+				{
+					it = this->_capacity - 1;
+					while ((it - n) != position - 1)
+					{
+						this->_alloc.construct(&(*(it)), *(it - n));
+						this->_alloc.destroy(&(*(it - n)));
+						it--;
+					}
+				}
+				for (iterator it = position; it != (position + n); it++)
+				{
+					this->_alloc.construct(&(*it), val);
+					this->_back++;
+				}
 			};
 
 			template<class InputIterator>
-			void					insert(iterator position, InputIterator first, InputIterator last)
+			void					insert(iterator position, InputIterator first, InputIterator last,
+											typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = 0)
 			{
-				//work
-				(void)first;
-				(void)last;
-				(void)position;
+				pointer		prev_front;
+				pointer		prev_back;
+				size_type	prev_size;
+				size_type	prev_capacity;
+				size_type	n;
+				iterator	it;
+
+				n = last - first;
+				if (this->_capacity == this->_back)		
+				{
+					prev_front = this->_front;
+					prev_back = this->_back;
+					prev_size = this->size();
+					prev_capacity = this->capacity();
+					this->_front = this->_alloc.allocate(prev_size + n + 1);
+					this->_back = this->_front;
+					for (size_type i = 0; i < prev_size; i++)
+					{
+						if (prev_front == &(*position))
+							position = iterator(this->_back);
+						if (prev_front == &(*first))
+							first = iterator(this->_back);
+						if (prev_front == &(*last))
+							last = iterator(this->_back);
+						this->_alloc.construct(this->_back, *prev_front++);
+						this->_back++;
+					}
+					if (prev_front == &(*position))
+						position = iterator(this->_back);
+					if (prev_front == &(*first))
+						first = iterator(this->_back);
+					if (prev_front == &(*last))
+						last = iterator(this->_back);
+					this->_alloc.deallocate(prev_front - prev_size, prev_capacity);
+					this->_capacity = this->_front + prev_size + n;
+				}
+				if (position.base() == 0)
+					position = iterator(this->_back);
+
+				if (this->size() > 0 && position != this->end())
+				{
+					it = this->_capacity - 1;
+					while ((it - n) != position - 1)
+					{
+						this->_alloc.construct(&(*(it)), *(it - n));
+						this->_alloc.destroy(&(*(it - n)));
+						it--;
+					}
+				}
+				for (iterator it = position; it != (position + n); it++)
+				{
+					this->_alloc.construct(&(*it), *first++);
+					this->_back++;
+				}
 			};
 
 			iterator				erase(iterator position)
 			{
-				//work
+				iterator	it;
+
+				if (position.base() == 0)
+					position = iterator(this->_back);
+				this->_alloc.destroy(&(*position));
+				it = position;
+				while (&(*it) != this->_back - 1)
+				{
+					this->_alloc.construct(&(*it), *(it + 1));
+					this->_alloc.destroy(&(*(it + 1)));
+					it++;
+				}
+				this->_back--;
 				return (position);
 			};
 
 			iterator				erase(iterator first, iterator last)
 			{
-				//work
-				return (first);
-				(void)last;
+				size_type	n;
+
+				if (first.base() == 0)
+					first = iterator(this->_back);
+				n = last - first;
+				while (first != last)
+				{
+					this->_alloc.destroy(&(*first));
+					first++;
+				}
+				while (first != this->end() && n != 0)
+				{
+					this->_alloc.construct(&(*(first - n)), *first++);
+					this->_alloc.destroy(&(*(first - 1)));
+				}
+				this->_back -= n;
+				return (last - n);
 			};
 
 			void					swap(vector &x)
 			{
-				//work
-				(void)x;
+				allocator_type	tmp_alloc;
+				pointer			tmp_front;
+				pointer			tmp_back;
+				pointer			tmp_capacity;
+
+				if (x == *this)
+					return;
+				tmp_alloc = this->_alloc;
+				tmp_front = this->_front;
+				tmp_back = this->_back;
+				tmp_capacity = this->_capacity;
+				this->_alloc = x._alloc;
+				this->_front = x._front;
+				this->_back = x._back;
+				this->_capacity = x._capacity;
+				x._alloc = tmp_alloc;
+				x._front = tmp_front;
+				x._back = tmp_back;
+				x._capacity = tmp_capacity;
 			};
 
 			void					clear()

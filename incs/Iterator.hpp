@@ -1,17 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Iterator.hpp                                       :+:      :+:    :+:   */
+/*   iterator.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mbouzaie <mbouzaie@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/22 20:57:56 by mbouzaie          #+#    #+#             */
-/*   Updated: 2021/09/21 18:55:20 by mbouzaie         ###   ########.fr       */
+/*   Updated: 2021/10/05 22:46:44 by mbouzaie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef _ITERATOR_HPP
-# define _ITERATOR_HPP
+#ifndef ITERATOR_HPP
+# define ITERATOR_HPP
 # include <iostream>
 
 namespace ft
@@ -21,10 +21,11 @@ namespace ft
 		
 	};
 
-	struct input_iterator_tag
+	struct bidirectional_iterator_tag
 	{
 
 	};
+	
 
 	template <class Iter>
 	class	iterator_traits

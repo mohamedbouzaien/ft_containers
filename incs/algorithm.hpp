@@ -6,12 +6,12 @@
 /*   By: mbouzaie <mbouzaie@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/18 14:16:08 by mbouzaie          #+#    #+#             */
-/*   Updated: 2021/09/18 14:34:21 by mbouzaie         ###   ########.fr       */
+/*   Updated: 2021/09/22 14:46:22 by mbouzaie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef _ALGORITHM_HPP
-# define _ALGORITHM_HPP
+#ifndef ALGORITHM_HPP
+# define ALGORITHM_HPP
 
 namespace   ft
 {

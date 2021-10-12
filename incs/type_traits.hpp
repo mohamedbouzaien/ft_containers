@@ -6,7 +6,7 @@
 /*   By: mbouzaie <mbouzaie@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/14 20:51:13 by mbouzaie          #+#    #+#             */
-/*   Updated: 2021/09/15 12:12:47 by mbouzaie         ###   ########.fr       */
+/*   Updated: 2021/09/22 14:40:31 by mbouzaie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,7 +114,18 @@ namespace ft
 	{
 
 	};
-	
+
+	template <bool, typename T = void>
+	struct enable_if
+	{
+
+	};
+
+	template <typename T>
+	struct enable_if<true, T>
+	{
+		typedef T type;
+	};
 }
 
 #endif

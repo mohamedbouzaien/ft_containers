@@ -6,11 +6,11 @@
 /*   By: mbouzaie <mbouzaie@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/09 12:46:15 by mbouzaie          #+#    #+#             */
-/*   Updated: 2021/09/21 15:54:51 by mbouzaie         ###   ########.fr       */
+/*   Updated: 2021/09/22 14:40:57 by mbouzaie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "incs/Vector.hpp"
+#include "incs/vector.hpp"
 #include <iostream>
 #include <vector>
 
