@@ -6,11 +6,12 @@
 /*   By: mbouzaie <mbouzaie@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/09 12:46:15 by mbouzaie          #+#    #+#             */
-/*   Updated: 2021/09/22 14:40:57 by mbouzaie         ###   ########.fr       */
+/*   Updated: 2021/10/12 21:02:10 by mbouzaie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "incs/vector.hpp"
+#include "incs/stl_tree.hpp"
 #include <iostream>
 #include <vector>
 
@@ -101,6 +102,7 @@ void    vectorTest_AssignRange(T& cont)
 
 int     main()
 {
+    /*
 	ft::vector<int> v;
 
 	v.push_back(10);
@@ -126,5 +128,15 @@ int     main()
     std::cout << std::endl;
     std::cout << v4.size() << std::endl;
 	vectorTest_PushBack(v4);
+    */
+
+    ft::rb_tree<int, int> tree;
+    int arr[] = {1,4,6,3,5,7,8,2,9};
+    for(int i=0;i<9;i++)
+    {
+        tree.insert(arr[i]);
+        std::cout << std::endl;
+        tree.inorderTraversal();
+    }
 	return (0);
 }
