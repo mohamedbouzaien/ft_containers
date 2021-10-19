@@ -6,7 +6,7 @@
 /*   By: mbouzaie <mbouzaie@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/30 18:08:06 by mbouzaie          #+#    #+#             */
-/*   Updated: 2021/10/16 14:37:17 by mbouzaie         ###   ########.fr       */
+/*   Updated: 2021/10/19 20:34:30 by mbouzaie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ namespace ft
 		public:
 			typedef	Key											key_type;
 			typedef	T											mapped_type;
-			typedef	ft::pair<const key_type, mapped_type>		value_type;
+			typedef	ft::pair<key_type, mapped_type>				value_type;
 			typedef	Compare										key_compare;
 			class	value_compare : ft::binary_function<value_type, value_type, bool>
 			{
@@ -53,8 +53,8 @@ namespace ft
 			typedef	typename	allocator_type::const_reference					const_reference;
 			typedef	typename	allocator_type::pointer							pointer;
 			typedef	typename	allocator_type::const_pointer					const_pointer;
-			typedef				ft::rb_tree_iterator<value_type>				iterator;
-			typedef				ft::rb_tree_const_iterator<value_type>			const_iterator;
+			typedef	typename	ft::rb_tree<value_type, Compare>::iterator		iterator;
+			typedef	typename	ft::rb_tree<value_type, Compare>::const_iterator	const_iterator;
 			typedef				ft::reverse_iterator<iterator>					reverse_iterator;
 			typedef				ft::reverse_iterator<const_iterator>			const_reverse_iterator;
 			typedef 			ptrdiff_t										difference_type;
@@ -95,64 +95,64 @@ namespace ft
 			};
 			
 			map							&operator=(const map &x)
-			{
-				(void)x;
-				return;
+			{	if (this == &x)
+					return (*this);
+				return (*this);
 			};
 
 			iterator					begin()
 			{
-				return (iterator(this->_tree->begin()));
+				return (iterator(this->_tree.begin()));
 			};
 
 			const_iterator				begin()						const
 			{
-				return (const_iterator(this->_tree-begin()));
+				return (const_iterator(this->_tree.begin()));
 			};
 
 			iterator					end()
 			{
-				return (iterator(this->_tree->end()));
+				return (iterator(this->_tree.end()));
 			};
 
 			const_iterator				end()						const
 			{
-				return (const_iterator(this->_tree->end()));
+				return (const_iterator(this->_tree.end()));
 			};
 
 			reverse_iterator			rbegin()
 			{
-				return (reverse_iterator(this->_tree->begin()));
+				return (reverse_iterator(this->_tree.begin()));
 			};
 
 			const_reverse_iterator		rbegin()					const
 			{
-				return (const_reverse_iterator(this->_tree->begin()));
+				return (const_reverse_iterator(this->_tree.begin()));
 			};
 
 			reverse_iterator			rend()
 			{
-				return (reverse_iterator(this->_tree->end()));
+				return (reverse_iterator(this->_tree.end()));
 			};
 
 			const_reverse_iterator		rend()						const
 			{
-				return (const_reverse_iterator(this->_tree->end()));				
+				return (const_reverse_iterator(this->_tree.end()));				
 			};
 
 			bool						empty()						const
 			{
-				return (this->_tree->empty());
+				return (this->_tree.empty());
 			};
 
 			size_type					size()						const
 			{
-				return (this->_tree->size());
+				return (this->_tree.size());
 			};
 
 			size_type					max_size()					const
 			{
-				return (this->_tree->max_size());
+				return (this->_tree.max_size());
 			};
 
 			mapped_type					operator[](const key_type &k)

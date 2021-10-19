@@ -6,7 +6,7 @@
 /*   By: mbouzaie <mbouzaie@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/05 17:27:11 by mbouzaie          #+#    #+#             */
-/*   Updated: 2021/10/16 14:34:32 by mbouzaie         ###   ########.fr       */
+/*   Updated: 2021/10/19 20:13:08 by mbouzaie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,7 @@ namespace ft
 	};
 
 	template <class T>
-	class rb_tree_iterator : iterator<bidirectional_iterator_tag, T>
+	class rb_tree_iterator : public ft::iterator<bidirectional_iterator_tag, T>
 	{
 		public:
 			typedef	T					value_type;
@@ -86,19 +86,19 @@ namespace ft
 			typedef	node_base::pointer	base_pointer;
 			typedef	ptrdiff_t			difference_type;
 			typedef	node<T>*			link_type;
-			base_pointer	_node;
+			link_type	_node;
 
-			rb_tree_iterator() : _node(0)
+			rb_tree_iterator() : _node()
 			{
 				
 			};
 
-			rb_tree_iterator(pointer node) : _node(node)
+			rb_tree_iterator(link_type node) : _node(node)
 			{
 
 			};
 
-			rb_tree_iterator(rb_tree_iterator const &copy) : _node(copy._node)
+			rb_tree_iterator(self const &copy) : _node(copy._node)
 			{
 
 			};
@@ -136,8 +136,8 @@ namespace ft
 				}
 				else
 				{
-					base_pointer	tmp = this->_node->parent;
-					while (this->_node == this->_tmp->right)
+					link_type	tmp = this->_node->parent;
+					while (this->_node == tmp->right)
 					{
 						this->_node = tmp;
 						tmp = tmp->parent;
@@ -159,7 +159,7 @@ namespace ft
 
 			self&	operator--()
 			{
-				base_pointer	tmp;
+				link_type	tmp;
 
 				if (this->_node->color == red && this->_node->parent->parent == this->_node)
 					this->_node = this->_node->right;
@@ -198,12 +198,12 @@ namespace ft
 
 			difference_type			operator!=(const rb_tree_iterator &rhs)	const
 			{
-				return (this->_node == rhs._node);
+				return (this->_node != rhs._node);
 			};
 	};
 
 	template <class T>
-	class rb_tree_const_iterator : iterator<bidirectional_iterator_tag, T>
+	class rb_tree_const_iterator : public ft::iterator<bidirectional_iterator_tag, T>
 	{
 		public:
 			typedef	T					value_type;
@@ -213,14 +213,15 @@ namespace ft
 			typedef	node_base::const_pointer	base_pointer;
 			typedef	ptrdiff_t			difference_type;
 			typedef	node<T>*			link_type;
-			base_pointer	_node;
+
+			link_type	_node;
 			
-			rb_tree_const_iterator() : _node(0)
+			rb_tree_const_iterator() : _node()
 			{
 				
 			};
 
-			rb_tree_const_iterator(pointer node) : _node(node)
+			rb_tree_const_iterator(link_type node) : _node(node)
 			{
 
 			};
@@ -263,8 +264,8 @@ namespace ft
 				}
 				else
 				{
-					base_pointer	tmp = this->_node->parent;
-					while (this->_node == this->_tmp->right)
+					link_type	tmp = this->_node->parent;
+					while (this->_node == tmp->right)
 					{
 						this->_node = tmp;
 						tmp = tmp->parent;
@@ -285,7 +286,7 @@ namespace ft
 
 			self&	operator--()
 			{
-				base_pointer	tmp;
+				link_type	tmp;
 
 				if (this->_node->color == red && this->_node->parent->parent == this->_node)
 					this->_node = this->_node->right;
@@ -317,14 +318,14 @@ namespace ft
 				return (it);
 			};
 			
-			difference_type			operator==(const rb_tree_const_iterator &rhs)	const
+			difference_type			operator==(const rb_tree_const_iterator &rhs)
 			{
 				return (this->_node == rhs._node);
 			};
 
-			difference_type			operator!=(const rb_tree_const_iterator &rhs)	const
+			difference_type			operator!=(const rb_tree_const_iterator &rhs)
 			{
-				return (this->_node == rhs._node);
+				return (this->_node != rhs._node);
 			};
 	};
 
@@ -374,7 +375,7 @@ namespace ft
 			bool			_right_left;
 			bool			_left_right;
 
-			link_type	createNode(const_reference val)
+			link_type	createNode(value_type val)
 			{
 				link_type	new_node;
 
@@ -493,7 +494,7 @@ namespace ft
 				return (node);
 			}
 
-			link_type	insert_and_rebalance(link_type header, const_reference val)
+			link_type	insert_and_rebalance(link_type header, value_type val)
 			{
 				bool	rotate;
 
@@ -504,7 +505,7 @@ namespace ft
 					this->_count++;
 					return (header);
 				}
-				if (val > header->value)
+				if (val.first > header->value.first)
 				{
 					header->right = insert_and_rebalance(header->right, val);
 					header->right->parent = header;
@@ -580,7 +581,7 @@ namespace ft
 				return (tree);
 			};
 
-			iterator	insert(const_reference val)
+			iterator	insert(value_type val)
 			{
 				if (this->_header == 0)
 				{
@@ -597,22 +598,12 @@ namespace ft
 				return (this->_header);
 			};
 
-			link_type		begin()
+			link_type		begin()	const
 			{
 				return (this->_header->parent);
 			};
 
-			const_link_type	begin()		const
-			{
-				return (this->_header->parent);
-			}
-
-			link_type		end()
-			{
-				return (this->_header);
-			};
-
-			const_link_type	end()	const
+			link_type		end()	const
 			{
 				return (this->_header);
 			};

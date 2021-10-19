@@ -6,14 +6,15 @@
 /*   By: mbouzaie <mbouzaie@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/09 12:46:15 by mbouzaie          #+#    #+#             */
-/*   Updated: 2021/10/14 16:50:22 by mbouzaie         ###   ########.fr       */
+/*   Updated: 2021/10/19 20:01:42 by mbouzaie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "incs/vector.hpp"
-#include "incs/stl_tree.hpp"
+#include "incs/map.hpp"
 #include <iostream>
 #include <vector>
+#include <map>
 
 template <typename T>
 void    vectorTest_Resize(T& cont)
@@ -100,6 +101,13 @@ void    vectorTest_AssignRange(T& cont)
     delete x;
 }
 
+template <typename T>
+inline void printMapContainer(T& cont)
+{
+    for (typename T::const_iterator it = cont.begin(); it != cont.end(); ++it)
+        std::cout << "[" << it->first << "][" << it->second << "] | ";
+}
+
 int     main()
 {
     /*
@@ -130,14 +138,17 @@ int     main()
 	vectorTest_PushBack(v4);
     */
 
-    ft::rb_tree<int, int> tree;
+    ft::map<int, std::string> map1;
+    std::map<int, std::string> map2;
     int arr[] = {1,4,6,3,5,7,8,2,9};
     for(int i=0;i<9;i++)
     {
-        tree.insert(arr[i]);
+        ft::pair<int, std::string> p(arr[i], "aaaa");
+        map1.insert(p);
+
+        //map2.insert(p);
         std::cout << std::endl;
-        tree.inorderTraversal();
     }
-    tree.printTree();
+    printMapContainer(map1);
 	return (0);
 }
