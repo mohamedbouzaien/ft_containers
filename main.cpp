@@ -6,7 +6,7 @@
 /*   By: mbouzaie <mbouzaie@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/09 12:46:15 by mbouzaie          #+#    #+#             */
-/*   Updated: 2021/10/12 21:02:10 by mbouzaie         ###   ########.fr       */
+/*   Updated: 2021/10/14 16:50:22 by mbouzaie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,5 +138,6 @@ int     main()
         std::cout << std::endl;
         tree.inorderTraversal();
     }
+    tree.printTree();
 	return (0);
 }

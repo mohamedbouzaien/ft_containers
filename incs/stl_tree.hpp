@@ -6,7 +6,7 @@
 /*   By: mbouzaie <mbouzaie@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/05 17:27:11 by mbouzaie          #+#    #+#             */
-/*   Updated: 2021/10/12 22:20:54 by mbouzaie         ###   ########.fr       */
+/*   Updated: 2021/10/16 14:34:32 by mbouzaie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,7 +84,7 @@ namespace ft
 			typedef	T*					pointer;
 			typedef	rb_tree_iterator<T>	self;
 			typedef	node_base::pointer	base_pointer;
-			typedef	typename	ft::iterator<ft::bidirectional_iterator_tag, T>::difference_type	difference_type;
+			typedef	ptrdiff_t			difference_type;
 			typedef	node<T>*			link_type;
 			base_pointer	_node;
 
@@ -93,7 +93,7 @@ namespace ft
 				
 			};
 
-			rb_tree_iterator(T* node) : _node(node)
+			rb_tree_iterator(pointer node) : _node(node)
 			{
 
 			};
@@ -211,7 +211,7 @@ namespace ft
 			typedef	T*					pointer;
 			typedef	rb_tree_const_iterator<T>	self;
 			typedef	node_base::const_pointer	base_pointer;
-			typedef	typename	ft::iterator<ft::bidirectional_iterator_tag, T>::difference_type	difference_type;
+			typedef	ptrdiff_t			difference_type;
 			typedef	node<T>*			link_type;
 			base_pointer	_node;
 			
@@ -220,7 +220,7 @@ namespace ft
 				
 			};
 
-			rb_tree_const_iterator(T* node) : _node(node)
+			rb_tree_const_iterator(pointer node) : _node(node)
 			{
 
 			};
@@ -340,14 +340,13 @@ namespace ft
 		return (lhs._node != rhs._node);
 	};
 	
-	template <class Key, class T, class Compare = ft::less<Key>, class Alloc = std::allocator<T> >
+	template <class T, class Compare, class Alloc = std::allocator<T> >
 	class rb_tree
 	{
 		public:
 			typedef	typename	Alloc::template rebind< node<T> >::other node_allocator;
 			typedef				node_base::pointer			base_pointer;
 			typedef				node_base::const_pointer	const_base_pointer;
-			typedef				Key							key_type;
 			typedef				T							value_type;
 			typedef				value_type*					pointer;
 			typedef				const value_type*			const_pointer;
@@ -375,7 +374,7 @@ namespace ft
 			bool			_right_left;
 			bool			_left_right;
 
-			link_type	createNode(reference val)
+			link_type	createNode(const_reference val)
 			{
 				link_type	new_node;
 
@@ -458,7 +457,7 @@ namespace ft
 			{
 				if (node->parent->right == node)
 				{
-					if (node->parent->left == 0 || node->parent->color == black)
+					if (node->parent->left == 0 || node->parent->left->color == black)
 					{
 						if (node->left != 0 && node->left->color == red)
 							_right_left = true;
@@ -494,7 +493,7 @@ namespace ft
 				return (node);
 			}
 
-			link_type	handle_insert(link_type header, reference val)
+			link_type	insert_and_rebalance(link_type header, const_reference val)
 			{
 				bool	rotate;
 
@@ -502,40 +501,43 @@ namespace ft
 				if (header == 0)
 				{
 					header = this->createNode(val);
+					this->_count++;
 					return (header);
 				}
 				if (val > header->value)
 				{
-					header->right = handle_insert(header->right, val);
-					if (header != this->_header)
-						if (header->color == red && header->left->color == red)
-							rotate = true;
-				}
-				else
-				{
-					header->left = handle_insert(header->left, val);
+					header->right = insert_and_rebalance(header->right, val);
+					header->right->parent = header;
 					if (header != this->_header)
 						if (header->color == red && header->right->color == red)
 							rotate = true;
 				}
+				else
+				{
+					header->left = insert_and_rebalance(header->left, val);
+					header->left->parent = header;
+					if (header != this->_header)
+						if (header->color == red && header->left->color == red)
+							rotate = true;
+				}
 				if (_left_left)
 				{
-					left_left_rotation(header);
+					header = left_left_rotation(header);
 					_left_left = false;
 				}
 				else if (_right_right)
 				{
-					right_right_rotation(header);
+					header = right_right_rotation(header);
 					_right_right = false;
 				}
 				else if (_right_left)
 				{
-					right_left_rotation(header);
+					header = right_left_rotation(header);
 					_right_left = false;
 				}
 				else if (_left_right)
 				{
-					left_right_rotation(header);
+					header = left_right_rotation(header);
 					_left_right = false;
 				}
 				if (rotate)
@@ -547,23 +549,23 @@ namespace ft
 		
 		public:
 
-			rb_tree()
+			rb_tree() : _header(0), _count(0), _left_left(false), _right_right(false), _right_left(false), _left_right(false)
 			{
 
 			};
 
-			rb_tree(const Compare& comp) : _comp(comp)
+			rb_tree(const Compare& comp) : _comp(comp), _header(0), _count(0)
 			{
 
 			};
 
 			rb_tree(const Compare comp, const allocator_type& alloc) :
-					_comp(comp), _alloc(alloc)
+					_comp(comp), _alloc(alloc), _header(0), _count(0)
 			{
 
 			};
 
-			rb_tree(const rb_tree& tree) : _alloc(tree._alloc), _comp(tree)
+			rb_tree(const rb_tree& tree) : _alloc(tree._alloc), _comp(tree), _count(tree._count)
 			{
 
 			};
@@ -578,7 +580,7 @@ namespace ft
 				return (tree);
 			};
 
-			void	insert(reference val)
+			iterator	insert(const_reference val)
 			{
 				if (this->_header == 0)
 				{
@@ -586,8 +588,49 @@ namespace ft
 					this->_header->color = black;
 				}
 				else
-					this->_header = handle_insert(this->_header, val);
+					this->_header = insert_and_rebalance(this->_header, val);
+				return (iterator(this->_header));
+			};
+
+			link_type		getHeader()
+			{
+				return (this->_header);
+			};
+
+			link_type		begin()
+			{
+				return (this->_header->parent);
+			};
+
+			const_link_type	begin()		const
+			{
+				return (this->_header->parent);
 			}
+
+			link_type		end()
+			{
+				return (this->_header);
+			};
+
+			const_link_type	end()	const
+			{
+				return (this->_header);
+			};
+
+			difference_type	empty()	const
+			{
+				return (this->_count == 0);
+			};
+
+			size_type		size()	 const
+			{
+				return (this->_count);
+			};
+
+			size_type		max_size()	const
+			{
+				return (this->_alloc->max_size());
+			};
 //ALL CONTENT HERE IS COPIED FOR TESTS
 			 // helper function to print inorder traversal
 			void inorderTraversalHelper(link_type n)
@@ -625,7 +668,7 @@ namespace ft
 			// function to print the tree.
 			void printTree()
 			{
-				printTreeHelper(this->_header, 0);
+				printTreeHelper(this->_header, 4);
 			}
 	};
 };
