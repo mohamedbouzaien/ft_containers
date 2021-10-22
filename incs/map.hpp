@@ -6,7 +6,7 @@
 /*   By: mbouzaie <mbouzaie@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/30 18:08:06 by mbouzaie          #+#    #+#             */
-/*   Updated: 2021/10/21 17:03:56 by mbouzaie         ###   ########.fr       */
+/*   Updated: 2021/10/22 20:27:57 by mbouzaie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,22 +99,22 @@ namespace ft
 					return (*this);
 				return (*this);
 			};
-/*
+
 			iterator					begin()
 			{
 				return (iterator(this->_tree.begin()));
 			};
-*/
+
 			const_iterator				begin()						const
 			{
 				return (const_iterator(this->_tree.begin()));
 			};
-/*
+
 			iterator					end()
 			{
 				return (iterator(this->_tree.end()));
 			};
-*/
+
 			const_iterator				end()						const
 			{
 				return (const_iterator(this->_tree.end()));

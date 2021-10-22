@@ -6,7 +6,7 @@
 /*   By: mbouzaie <mbouzaie@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/05 17:27:11 by mbouzaie          #+#    #+#             */
-/*   Updated: 2021/10/22 01:39:38 by mbouzaie         ###   ########.fr       */
+/*   Updated: 2021/10/22 21:01:10 by mbouzaie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -608,14 +608,12 @@ namespace ft
 				{
 					link_type	dummy_r;
 					dummy_r = this->_header;
-					if (!this->_header->right && this->_header->left)
-						dummy_r = dummy_r->left;
-					while (dummy_r->right->parent)
+					while (dummy_r->right && dummy_r->right->parent)
 						dummy_r = dummy_r->right;
-					this->_alloc.deallocate(dummy_r, 1);
+					this->_alloc.deallocate(dummy_r->right, 1);
+					dummy_r->right = 0;
 					this->_header = insert_and_rebalance(this->_header, val);
 					handle_dummy_r();
-					//this->_header->parent = 0;
 				}
 				return (iterator(this->_header));
 			};
@@ -623,6 +621,20 @@ namespace ft
 			link_type		getHeader()
 			{
 				return (this->_header);
+			};
+
+			link_type		begin()
+			{
+				link_type	tmp;
+
+				tmp = this->_header;
+				if (!this->_header->right->parent && !this->_header->parent)
+					return (tmp);
+				if (!this->_header->left->parent && this->_header->right->parent)
+					tmp = tmp->right;
+				while (tmp->left)
+					tmp = tmp->left;
+				return (tmp);
 			};
 
 			link_type		begin()	const
@@ -639,7 +651,7 @@ namespace ft
 				return (tmp);
 			};
 
-			link_type		end()	const
+			link_type		end()
 			{
 				link_type	tmp;
 
@@ -652,6 +664,20 @@ namespace ft
 					tmp = tmp->right;
 				return (tmp);
 			};
+
+			link_type		end()	const
+			{				
+				link_type	tmp;
+
+				tmp = this->_header;
+				if (!this->_header->right && !this->_header->left)
+					return (tmp);
+				if (!this->_header->right && this->_header->left)
+					tmp = tmp->left;
+				while (tmp->right)
+					tmp = tmp->right;
+				return (tmp);
+			}
 
 			difference_type	empty()	const
 			{
