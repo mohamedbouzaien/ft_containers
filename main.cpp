@@ -6,12 +6,13 @@
 /*   By: mbouzaie <mbouzaie@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/09 12:46:15 by mbouzaie          #+#    #+#             */
-/*   Updated: 2021/10/19 20:01:42 by mbouzaie         ###   ########.fr       */
+/*   Updated: 2021/10/21 16:57:33 by mbouzaie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "incs/vector.hpp"
 #include "incs/map.hpp"
+# include "incs/stl_tree.hpp"
 #include <iostream>
 #include <vector>
 #include <map>
@@ -140,15 +141,19 @@ int     main()
 
     ft::map<int, std::string> map1;
     std::map<int, std::string> map2;
+    ft::rb_tree<ft::pair<int, std::string>, ft::less<int> > tree;
     int arr[] = {1,4,6,3,5,7,8,2,9};
     for(int i=0;i<9;i++)
     {
         ft::pair<int, std::string> p(arr[i], "aaaa");
         map1.insert(p);
+        //tree.insert(p);
 
         //map2.insert(p);
         std::cout << std::endl;
+        //map1.inorderTraversal();
     }
     printMapContainer(map1);
+    //map1.printTree();
 	return (0);
 }

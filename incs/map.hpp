@@ -6,7 +6,7 @@
 /*   By: mbouzaie <mbouzaie@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/30 18:08:06 by mbouzaie          #+#    #+#             */
-/*   Updated: 2021/10/19 20:34:30 by mbouzaie         ###   ########.fr       */
+/*   Updated: 2021/10/21 17:03:56 by mbouzaie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,22 +99,22 @@ namespace ft
 					return (*this);
 				return (*this);
 			};
-
+/*
 			iterator					begin()
 			{
 				return (iterator(this->_tree.begin()));
 			};
-
+*/
 			const_iterator				begin()						const
 			{
 				return (const_iterator(this->_tree.begin()));
 			};
-
+/*
 			iterator					end()
 			{
 				return (iterator(this->_tree.end()));
 			};
-
+*/
 			const_iterator				end()						const
 			{
 				return (const_iterator(this->_tree.end()));
@@ -277,6 +277,46 @@ namespace ft
 			{
 				return (this->_alloc);
 			};
+
+			//FOR TEST PURPOSES ONLY
+			void inorderTraversalHelper(node<value_type> *n)
+			{
+				if(n != 0)
+				{
+					inorderTraversalHelper(n->left);
+					std::cout << n->value.first;
+					inorderTraversalHelper(n->right);
+				}
+			}
+			//function to print inorder traversal
+			void inorderTraversal()
+			{
+				inorderTraversalHelper(this->_tree.getHeader());
+			}
+
+						// helper function to print the tree.
+			void printTreeHelper(node<value_type> *root, int space)
+			{
+				int i;
+				if(root != 0)
+				{
+					space = space + 10;
+					printTreeHelper(root->right, space);
+					std::cout << std::endl;
+					for ( i = 10; i < space; i++)
+					{
+						std::cout << " ";
+					}
+					std::cout << root->value.first;
+					std::cout << std::endl;
+					printTreeHelper(root->left, space);
+				}
+			}
+			// function to print the tree.
+			void printTree()
+			{
+				printTreeHelper(this->_tree.getHeader(), 4);
+			}
 	};
 };
 

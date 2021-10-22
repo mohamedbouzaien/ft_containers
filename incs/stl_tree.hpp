@@ -6,7 +6,7 @@
 /*   By: mbouzaie <mbouzaie@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/05 17:27:11 by mbouzaie          #+#    #+#             */
-/*   Updated: 2021/10/19 20:13:08 by mbouzaie         ###   ########.fr       */
+/*   Updated: 2021/10/22 01:39:38 by mbouzaie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,7 @@ namespace ft
 		link_type	parent;
 		link_type	left;
 		link_type	right;
+
 	};
 
 	template <class T>
@@ -299,7 +300,7 @@ namespace ft
 				}
 				else
 				{
-					tmp = this->_node->left;
+					tmp = this->_node->parent;
 					while (this->_node == tmp->left)
 					{
 						this->_node = tmp;
@@ -383,8 +384,8 @@ namespace ft
 				new_node->color = red;
 				new_node->value = val;
 				new_node->parent = 0;
-				new_node->right = 0;
 				new_node->left = 0;
+				new_node->right= 0;
 				return (new_node);
 			};
 
@@ -547,6 +548,17 @@ namespace ft
 				}
 				return (header);
 			};
+
+			void		handle_dummy_r()
+			{
+				link_type	tmp;
+
+				tmp = this->end();
+				tmp->right = this->_alloc.allocate(1);
+				tmp->right->parent = 0;
+				tmp->right->right = 0;
+				tmp->right->left = 0;
+			};
 		
 		public:
 
@@ -586,10 +598,25 @@ namespace ft
 				if (this->_header == 0)
 				{
 					this->_header = this->createNode(val);
+					this->_header->right = this->_alloc.allocate(1);
+					this->_header->right->parent = 0;
+					this->_header->right->right = 0;
+					this->_header->right->left = 0;
 					this->_header->color = black;
 				}
 				else
+				{
+					link_type	dummy_r;
+					dummy_r = this->_header;
+					if (!this->_header->right && this->_header->left)
+						dummy_r = dummy_r->left;
+					while (dummy_r->right->parent)
+						dummy_r = dummy_r->right;
+					this->_alloc.deallocate(dummy_r, 1);
 					this->_header = insert_and_rebalance(this->_header, val);
+					handle_dummy_r();
+					//this->_header->parent = 0;
+				}
 				return (iterator(this->_header));
 			};
 
@@ -600,12 +627,30 @@ namespace ft
 
 			link_type		begin()	const
 			{
-				return (this->_header->parent);
+				link_type	tmp;
+
+				tmp = this->_header;
+				if (!this->_header->right->parent && !this->_header->parent)
+					return (tmp);
+				if (!this->_header->left->parent && this->_header->right->parent)
+					tmp = tmp->right;
+				while (tmp->left)
+					tmp = tmp->left;
+				return (tmp);
 			};
 
 			link_type		end()	const
 			{
-				return (this->_header);
+				link_type	tmp;
+
+				tmp = this->_header;
+				if (!this->_header->right && !this->_header->left)
+					return (tmp);
+				if (!this->_header->right && this->_header->left)
+					tmp = tmp->left;
+				while (tmp->right)
+					tmp = tmp->right;
+				return (tmp);
 			};
 
 			difference_type	empty()	const
@@ -629,7 +674,7 @@ namespace ft
 				if(n != 0)
 				{
 					inorderTraversalHelper(n->left);
-					std::cout << n->value;
+					std::cout << n->value.first;
 					inorderTraversalHelper(n->right);
 				}
 			}
