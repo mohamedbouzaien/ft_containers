@@ -6,7 +6,7 @@
 /*   By: mbouzaie <mbouzaie@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/05 17:27:11 by mbouzaie          #+#    #+#             */
-/*   Updated: 2021/10/22 21:01:10 by mbouzaie         ###   ########.fr       */
+/*   Updated: 2021/10/23 22:00:56 by mbouzaie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,19 @@ namespace ft
 		link_type	left;
 		link_type	right;
 
+ 		bool	is_on_left()
+		{
+			 return this == parent->left;
+		};
+
+		node*	sibling()
+		{
+			if (this->parent == 0)
+				return (0);
+			if (this->is_on_left())
+				return (this->parent->right);
+			return (this->parent->left);
+		}
 	};
 
 	template <class T>
@@ -174,7 +187,7 @@ namespace ft
 				else
 				{
 					tmp = this->_node->left;
-					while (this->_node == tmp->left)
+					while (tmp && this->_node == tmp->left)
 					{
 						this->_node = tmp;
 						tmp = tmp->parent;
@@ -228,6 +241,11 @@ namespace ft
 			};
 
 			rb_tree_const_iterator(rb_tree_const_iterator const &copy) : _node(copy._node)
+			{
+
+			};
+
+			rb_tree_const_iterator(rb_tree_iterator<T> const &copy) : _node(copy._node)
 			{
 
 			};
@@ -455,7 +473,59 @@ namespace ft
 				return (node);
 			};
 
-			link_type	handle_roation(link_type node)
+			void	handle_double_black_rotation(link_type node)
+			{
+				if (node == this->_header)
+					return;
+				link_type	sibling = node->sibling();
+				link_type	parent = node->parent;
+				if (sibling == 0)
+					handle_double_black_rotation(parent);
+				else
+				{
+					if (sibling->color == red)
+					{
+						parent->color = red;
+						sibling->color = black;
+						if (sibling->is_on_left())
+							rotate_right(parent);
+						else
+							rotate_left(parent);
+					handle_double_black_rotation(node);	
+					}
+					else
+					{
+						if ((sibling->left != 0 && sibling->left->color == red) ||
+							(sibling->right != 0 && sibling->right->color == red))
+						{
+							if (sibling->left != 0 && sibling->left->color == red)
+							{
+								if (sibling->is_on_left())
+									left_left_rotation(parent);
+								else
+									right_left_rotation(parent);
+							}
+							else
+							{
+								if (sibling->is_on_left())
+									left_right_rotation(parent);
+								else
+									right_right_rotation(parent);
+							}
+						}
+						else
+						{
+							sibling->color = red;
+							if (parent->color == black)
+								handle_double_black_rotation(parent);
+							else
+								parent->color = black;
+						}
+					}
+				}
+			}
+
+			link_type	handle_double_red_roation(link_type node)
 			{
 				if (node->parent->right == node)
 				{
@@ -493,6 +563,13 @@ namespace ft
 					}
 				}
 				return (node);
+			}
+			void			swapValues(link_type u, link_type v)
+			{
+				value_type 	tmp;
+				tmp = u->value;
+				u->value = v->value;
+				v->value = tmp;
 			}
 
 			link_type	insert_and_rebalance(link_type header, value_type val)
@@ -544,10 +621,76 @@ namespace ft
 				}
 				if (rotate)
 				{
-					header =  handle_roation(header);
+					header =  handle_double_red_roation(header);
 				}
 				return (header);
 			};
+
+			void	handle_erase(link_type v)
+			{
+				link_type	u;
+				link_type	parent = v->parent;
+
+				if (v->left != 0 && v->right != 0)
+				{
+					u = v->right;
+					while (u->left != 0)
+						u = u->left;
+				}
+				else if (v->left == 0 && v->right == 0)
+					u = 0;
+				else if (v->left != 0)
+					u = v->left;
+				else
+					u = v->right;
+				if (u == 0)
+				{
+					if (v == this->_header)
+						this->_header = 0;
+					else
+					{
+						if ((u == 0 || u->color == black) && (v->color == black))
+							handle_double_black_rotation(v);
+						else
+						{
+							if (v->sibling() != 0)
+								v->sibling()->color = red;
+						}
+						if (v->is_on_left())
+							parent->left = 0;
+						else
+							parent->right = 0;
+					}
+					this->_alloc.deallocate(v, 1);
+					return;
+				}
+				if (v->left == 0 || v->right == 0)
+				{
+					if (v == this->_header)
+					{
+						v->value = u->value;
+						v->left = 0;
+						v->right = 0;
+						this->_alloc.deallocate(u, 1);
+					}
+					else
+					{
+						if (v->is_on_left())
+							parent->left = u;
+						else
+							parent->right = u;
+						this->_alloc.deallocate(v, 1);
+						u->parent = parent;
+						if ((u == 0 || u->color == black) && (v->color == black))
+							handle_double_black_rotation(u);
+						else
+							u->color = black;
+					}
+					return;
+				}
+				this->swapValues(u, v);
+				this->handle_erase(u);
+			}
 
 			void		handle_dummy_r()
 			{
@@ -618,6 +761,24 @@ namespace ft
 				return (iterator(this->_header));
 			};
 
+			difference_type		erase(value_type val)
+			{
+				link_type	v = find(val);
+				if (v != 0)
+				{
+					link_type	dummy_r;
+					dummy_r = this->_header;
+					while (dummy_r->right && dummy_r->right->parent)
+						dummy_r = dummy_r->right;
+					this->_alloc.deallocate(dummy_r->right, 1);
+					dummy_r->right = 0;
+					handle_erase(v);
+					handle_dummy_r();
+					return (true);
+				}
+				return false;
+			}
+
 			link_type		getHeader()
 			{
 				return (this->_header);
@@ -628,9 +789,9 @@ namespace ft
 				link_type	tmp;
 
 				tmp = this->_header;
-				if (!this->_header->right->parent && !this->_header->parent)
+				if (!tmp || (!this->_header->right && !this->_header->left))
 					return (tmp);
-				if (!this->_header->left->parent && this->_header->right->parent)
+				if (!this->_header->left && this->_header->right)
 					tmp = tmp->right;
 				while (tmp->left)
 					tmp = tmp->left;
@@ -642,9 +803,9 @@ namespace ft
 				link_type	tmp;
 
 				tmp = this->_header;
-				if (!this->_header->right->parent && !this->_header->parent)
+				if (!tmp || (!this->_header->right && !this->_header->left))
 					return (tmp);
-				if (!this->_header->left->parent && this->_header->right->parent)
+				if (!this->_header->left && this->_header->right)
 					tmp = tmp->right;
 				while (tmp->left)
 					tmp = tmp->left;
@@ -656,7 +817,7 @@ namespace ft
 				link_type	tmp;
 
 				tmp = this->_header;
-				if (!this->_header->right && !this->_header->left)
+				if (!tmp || (!this->_header->right && !this->_header->left))
 					return (tmp);
 				if (!this->_header->right && this->_header->left)
 					tmp = tmp->left;
@@ -666,18 +827,18 @@ namespace ft
 			};
 
 			link_type		end()	const
-			{				
+			{
 				link_type	tmp;
 
 				tmp = this->_header;
-				if (!this->_header->right && !this->_header->left)
+				if (!tmp || (!this->_header->right && !this->_header->left))
 					return (tmp);
 				if (!this->_header->right && this->_header->left)
 					tmp = tmp->left;
 				while (tmp->right)
 					tmp = tmp->right;
 				return (tmp);
-			}
+			};
 
 			difference_type	empty()	const
 			{
@@ -693,6 +854,57 @@ namespace ft
 			{
 				return (this->_alloc->max_size());
 			};
+
+			link_type		find(value_type &val)
+			{
+				link_type	tmp = this->_header;
+				while (tmp != 0)
+				{
+					if (val.first < tmp->value.first)
+					{
+						if (tmp->left == 0)
+							break;
+						else
+							tmp = tmp->left;
+					}
+					else if (val.first == tmp->value.first)
+						break;
+					else
+					{
+						if (tmp->right == 0)
+							break;
+						else
+							tmp = tmp->right;
+					}
+				}
+				return (tmp);
+			}
+
+
+			link_type		find(value_type &val)	const
+			{
+				link_type	tmp = this->_header;
+				while (tmp != 0)
+				{
+					if (val.first < tmp->value.first)
+					{
+						if (tmp->left == 0)
+							break;
+						else
+							tmp = tmp->left;
+					}
+					else if (val.first == tmp->value.first)
+						break;
+					else
+					{
+						if (tmp->right == 0)
+							break;
+						else
+							tmp = tmp->right;
+					}
+				}
+				return (tmp);
+			}
 //ALL CONTENT HERE IS COPIED FOR TESTS
 			 // helper function to print inorder traversal
 			void inorderTraversalHelper(link_type n)
