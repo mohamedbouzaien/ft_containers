@@ -6,7 +6,7 @@
 /*   By: mbouzaie <mbouzaie@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/30 18:08:06 by mbouzaie          #+#    #+#             */
-/*   Updated: 2021/10/23 21:55:43 by mbouzaie         ###   ########.fr       */
+/*   Updated: 2021/10/24 21:48:38 by mbouzaie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,7 @@ namespace ft
 			
 			~map()
 			{
-				this->clear();
+				//this->clear();
 			};
 			
 			map							&operator=(const map &x)

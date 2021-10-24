@@ -6,7 +6,7 @@
 /*   By: mbouzaie <mbouzaie@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/05 17:27:11 by mbouzaie          #+#    #+#             */
-/*   Updated: 2021/10/23 22:00:56 by mbouzaie         ###   ########.fr       */
+/*   Updated: 2021/10/24 21:41:01 by mbouzaie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -696,11 +696,16 @@ namespace ft
 			{
 				link_type	tmp;
 
-				tmp = this->end();
-				tmp->right = this->_alloc.allocate(1);
-				tmp->right->parent = 0;
-				tmp->right->right = 0;
-				tmp->right->left = 0;
+				tmp = this->_header;
+				if (tmp != 0)
+				{
+					while (tmp->right)
+						tmp = tmp->right;
+					tmp->right = this->_alloc.allocate(1);
+					tmp->right->parent = 0;
+					tmp->right->right = 0;
+					tmp->right->left = 0;
+				}
 			};
 		
 		public:
@@ -733,7 +738,10 @@ namespace ft
 
 			rb_tree		&operator=(const rb_tree &tree)
 			{
-				return (tree);
+				if (this == &tree)
+					return (*this);
+				this->_header = tree._header;
+				return (*this);
 			};
 
 			iterator	insert(value_type val)
@@ -746,6 +754,7 @@ namespace ft
 					this->_header->right->right = 0;
 					this->_header->right->left = 0;
 					this->_header->color = black;
+					this->_count++;
 				}
 				else
 				{
@@ -773,7 +782,8 @@ namespace ft
 					this->_alloc.deallocate(dummy_r->right, 1);
 					dummy_r->right = 0;
 					handle_erase(v);
-					handle_dummy_r();
+					if (this->_header != 0)
+						handle_dummy_r();
 					return (true);
 				}
 				return false;
@@ -789,7 +799,7 @@ namespace ft
 				link_type	tmp;
 
 				tmp = this->_header;
-				if (!tmp || (!this->_header->right && !this->_header->left))
+				if (!tmp || (!(this->_header->right && this->_header->right != this->end()) && !this->_header->left))
 					return (tmp);
 				if (!this->_header->left && this->_header->right)
 					tmp = tmp->right;
@@ -803,7 +813,7 @@ namespace ft
 				link_type	tmp;
 
 				tmp = this->_header;
-				if (!tmp || (!this->_header->right && !this->_header->left))
+				if (!tmp || (!(this->_header->right && this->_header->right != this->end()) && !this->_header->left))
 					return (tmp);
 				if (!this->_header->left && this->_header->right)
 					tmp = tmp->right;
