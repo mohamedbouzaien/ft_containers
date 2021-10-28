@@ -6,7 +6,7 @@
 /*   By: mbouzaie <mbouzaie@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/09 12:46:15 by mbouzaie          #+#    #+#             */
-/*   Updated: 2021/10/21 16:57:33 by mbouzaie         ###   ########.fr       */
+/*   Updated: 2021/10/27 13:03:06 by mbouzaie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -153,7 +153,10 @@ int     main()
         std::cout << std::endl;
         //map1.inorderTraversal();
     }
+    //ft::map<int, std::string> map3(++map1.begin(), map1.end());
+    //map3.insert(--map3.end(), *map1.begin());
     printMapContainer(map1);
+    //printMapContainer(map3);
     //map1.printTree();
 	return (0);
 }

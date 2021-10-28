@@ -6,7 +6,7 @@
 /*   By: mbouzaie <mbouzaie@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/30 18:08:06 by mbouzaie          #+#    #+#             */
-/*   Updated: 2021/10/24 21:48:38 by mbouzaie         ###   ########.fr       */
+/*   Updated: 2021/10/28 17:43:41 by mbouzaie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ namespace ft
 		public:
 			typedef	Key											key_type;
 			typedef	T											mapped_type;
-			typedef	ft::pair<key_type, mapped_type>				value_type;
+			typedef	ft::pair<key_type, mapped_type >		value_type;
 			typedef	Compare										key_compare;
 			class	value_compare : ft::binary_function<value_type, value_type, bool>
 			{

@@ -6,7 +6,7 @@
 /*   By: mbouzaie <mbouzaie@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/05 17:27:11 by mbouzaie          #+#    #+#             */
-/*   Updated: 2021/10/24 21:41:01 by mbouzaie         ###   ########.fr       */
+/*   Updated: 2021/10/28 17:44:38 by mbouzaie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -186,7 +186,7 @@ namespace ft
 				}
 				else
 				{
-					tmp = this->_node->left;
+					tmp = this->_node->parent;
 					while (tmp && this->_node == tmp->left)
 					{
 						this->_node = tmp;
@@ -564,6 +564,7 @@ namespace ft
 				}
 				return (node);
 			}
+			
 			void			swapValues(link_type u, link_type v)
 			{
 				value_type 	tmp;
@@ -572,7 +573,58 @@ namespace ft
 				v->value = tmp;
 			}
 
-			link_type	insert_and_rebalance(link_type header, value_type val)
+			void	insert_and_rebalance(value_type val)
+			{
+				link_type	header;
+				link_type	parent;
+				bool		pos;
+
+				header = this->_header;
+				parent = this->_header->parent;\
+				while (header != 0)
+				{
+					pos = false;
+					parent = header;
+					if (val.first > header->value.first)
+					{
+						header = header->right;
+						pos = true;
+					}
+					else
+						header = header->left;
+				}
+				header = this->createNode(val);
+				header->parent = parent;
+				if (pos)
+					header->parent->right = header;
+				else
+					header->parent->left = header;
+				this->_count++;
+				if (header->color == red && header->parent->color == red)
+					handle_double_red_roation(header);
+				if (_left_left)
+				{
+					header->parent = left_left_rotation(header->parent);
+					_left_left = false;
+				}
+				else if (_right_right)
+				{
+					header->parent = right_right_rotation(header->parent);
+					_right_right = false;
+				}
+				else if (_right_left)
+				{
+					header->parent = right_left_rotation(header->parent);
+					_right_left = false;
+				}
+				else if (_left_right)
+				{
+					header->parent = left_right_rotation(header->parent);
+					_left_right = false;
+				}	
+			}
+
+			/*link_type	insert_and_rebalance(link_type header, value_type val)
 			{
 				bool	rotate;
 
@@ -624,7 +676,7 @@ namespace ft
 					header =  handle_double_red_roation(header);
 				}
 				return (header);
-			};
+			};*/
 
 			void	handle_erase(link_type v)
 			{
@@ -702,7 +754,7 @@ namespace ft
 					while (tmp->right)
 						tmp = tmp->right;
 					tmp->right = this->_alloc.allocate(1);
-					tmp->right->parent = 0;
+					tmp->right->parent = tmp;
 					tmp->right->right = 0;
 					tmp->right->left = 0;
 				}
@@ -750,7 +802,7 @@ namespace ft
 				{
 					this->_header = this->createNode(val);
 					this->_header->right = this->_alloc.allocate(1);
-					this->_header->right->parent = 0;
+					this->_header->right->parent = this->_header;
 					this->_header->right->right = 0;
 					this->_header->right->left = 0;
 					this->_header->color = black;
@@ -760,11 +812,11 @@ namespace ft
 				{
 					link_type	dummy_r;
 					dummy_r = this->_header;
-					while (dummy_r->right && dummy_r->right->parent)
+					while (dummy_r->right && dummy_r->right->right)
 						dummy_r = dummy_r->right;
 					this->_alloc.deallocate(dummy_r->right, 1);
 					dummy_r->right = 0;
-					this->_header = insert_and_rebalance(this->_header, val);
+					insert_and_rebalance(val);
 					handle_dummy_r();
 				}
 				return (iterator(this->_header));
@@ -777,7 +829,7 @@ namespace ft
 				{
 					link_type	dummy_r;
 					dummy_r = this->_header;
-					while (dummy_r->right && dummy_r->right->parent)
+					while (dummy_r->right && dummy_r->right->right)
 						dummy_r = dummy_r->right;
 					this->_alloc.deallocate(dummy_r->right, 1);
 					dummy_r->right = 0;
@@ -801,8 +853,8 @@ namespace ft
 				tmp = this->_header;
 				if (!tmp || (!(this->_header->right && this->_header->right != this->end()) && !this->_header->left))
 					return (tmp);
-				if (!this->_header->left && this->_header->right)
-					tmp = tmp->right;
+				//if (!this->_header->left && this->_header->right)
+				//	tmp = tmp->right;
 				while (tmp->left)
 					tmp = tmp->left;
 				return (tmp);
@@ -815,8 +867,8 @@ namespace ft
 				tmp = this->_header;
 				if (!tmp || (!(this->_header->right && this->_header->right != this->end()) && !this->_header->left))
 					return (tmp);
-				if (!this->_header->left && this->_header->right)
-					tmp = tmp->right;
+				//if (!this->_header->left && this->_header->right)
+				//	tmp = tmp->right;
 				while (tmp->left)
 					tmp = tmp->left;
 				return (tmp);
