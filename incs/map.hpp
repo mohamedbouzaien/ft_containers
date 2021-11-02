@@ -6,7 +6,7 @@
 /*   By: mbouzaie <mbouzaie@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/30 18:08:06 by mbouzaie          #+#    #+#             */
-/*   Updated: 2021/10/28 17:43:41 by mbouzaie         ###   ########.fr       */
+/*   Updated: 2021/10/28 17:53:25 by mbouzaie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -182,7 +182,7 @@ namespace ft
 
 			void						erase(iterator position)
 			{
-				this->erase((*position));
+				this->erase((*position).first);
 			};
 
 			size_type					erase(const key_type &k)
