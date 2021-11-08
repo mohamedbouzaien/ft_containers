@@ -6,7 +6,7 @@
 /*   By: mbouzaie <mbouzaie@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/30 18:07:21 by mbouzaie          #+#    #+#             */
-/*   Updated: 2021/10/28 02:00:38 by mbouzaie         ###   ########.fr       */
+/*   Updated: 2021/11/02 11:58:14 by mbouzaie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,12 @@ namespace ft
 		};
 
 		pair(const pair &pr) : first(pr.first), second(pr.second)
+		{
+
+		};
+
+		template<typename U, typename V>
+		pair(const pair<U, V> &pr) : first(pr.first), second(pr.second)
 		{
 
 		};

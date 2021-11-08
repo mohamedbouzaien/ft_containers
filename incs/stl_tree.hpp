@@ -6,7 +6,7 @@
 /*   By: mbouzaie <mbouzaie@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/05 17:27:11 by mbouzaie          #+#    #+#             */
-/*   Updated: 2021/10/28 17:44:38 by mbouzaie         ###   ########.fr       */
+/*   Updated: 2021/11/08 17:40:12 by mbouzaie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -388,7 +388,8 @@ namespace ft
 			Compare			_comp;
 			link_type		_header;
 			size_type		_count;
-			node_allocator	_alloc;
+			node_allocator	_nalloc;
+			allocator_type	_palloc;
 			bool			_left_left;
 			bool			_right_right;
 			bool			_right_left;
@@ -398,9 +399,9 @@ namespace ft
 			{
 				link_type	new_node;
 
-				new_node = _alloc.allocate(1);
+				new_node = _nalloc.allocate(1);
 				new_node->color = red;
-				new_node->value = val;
+				this->_palloc.construct(&new_node->value, val);
 				new_node->parent = 0;
 				new_node->left = 0;
 				new_node->right= 0;
@@ -568,19 +569,22 @@ namespace ft
 			void			swapValues(link_type u, link_type v)
 			{
 				value_type 	tmp;
-				tmp = u->value;
-				u->value = v->value;
-				v->value = tmp;
+				this->_palloc.construct(&tmp,u->value);
+				this->_palloc.destroy(&u->value);
+				this->_palloc.construct(&u->value, v->value);
+				this->_palloc.destroy(&v->value);
+				this->_palloc.construct(&v->value, tmp);
+				this->_palloc.destroy(&tmp);
 			}
 
-			void	insert_and_rebalance(value_type val)
+			link_type	insert_and_rebalance(value_type val)
 			{
 				link_type	header;
 				link_type	parent;
 				bool		pos;
 
 				header = this->_header;
-				parent = this->_header->parent;\
+				parent = this->_header->parent;
 				while (header != 0)
 				{
 					pos = false;
@@ -621,7 +625,8 @@ namespace ft
 				{
 					header->parent = left_right_rotation(header->parent);
 					_left_right = false;
-				}	
+				}
+				return (header);
 			}
 
 			/*link_type	insert_and_rebalance(link_type header, value_type val)
@@ -713,17 +718,19 @@ namespace ft
 						else
 							parent->right = 0;
 					}
-					this->_alloc.deallocate(v, 1);
+					this->_nalloc.deallocate(v, 1);
+					this->_count--;
 					return;
 				}
 				if (v->left == 0 || v->right == 0)
 				{
 					if (v == this->_header)
 					{
-						v->value = u->value;
-						v->left = 0;
-						v->right = 0;
-						this->_alloc.deallocate(u, 1);
+						this->_palloc.destroy(&v->value);
+						this->_palloc.construct(&v->value, u->value);
+						v->left = u->left;
+						v->right = u->right;
+						this->_nalloc.deallocate(u, 1);
 					}
 					else
 					{
@@ -731,13 +738,14 @@ namespace ft
 							parent->left = u;
 						else
 							parent->right = u;
-						this->_alloc.deallocate(v, 1);
+						this->_nalloc.deallocate(v, 1);
 						u->parent = parent;
 						if ((u == 0 || u->color == black) && (v->color == black))
 							handle_double_black_rotation(u);
 						else
 							u->color = black;
 					}
+					this->_count--;
 					return;
 				}
 				this->swapValues(u, v);
@@ -753,12 +761,33 @@ namespace ft
 				{
 					while (tmp->right)
 						tmp = tmp->right;
-					tmp->right = this->_alloc.allocate(1);
+					tmp->right = this->_nalloc.allocate(1);
+					this->_palloc.construct(&tmp->right->value, ft::pair<typename T::first_type, typename T::second_type>());
 					tmp->right->parent = tmp;
 					tmp->right->right = 0;
 					tmp->right->left = 0;
 				}
 			};
+		
+			size_type		count_until(value_type val)	const
+			{
+				if (this->_header != 0)
+				{
+					iterator 	it = iterator(this->_header);
+					size_type	count = 0;
+					while (it != iterator(this->end()) && (*it).first != val.first)
+					{
+						it++;
+						count++;
+					}
+					//if ((*it).first == val.first && it == iterator(this->begin()))
+					//	return (1);
+					if ((*it).first == val.first && it != iterator(this->end()))
+						return (count);
+				}
+				return (0);
+			};
+
 		
 		public:
 
@@ -767,18 +796,13 @@ namespace ft
 
 			};
 
-			rb_tree(const Compare& comp) : _comp(comp), _header(0), _count(0)
+			rb_tree(const Compare comp, const allocator_type& alloc = allocator_type()) :
+					_comp(comp), _header(0), _count(0), _palloc(alloc),_left_left(false), _right_right(false), _right_left(false), _left_right(false)
 			{
 
 			};
 
-			rb_tree(const Compare comp, const allocator_type& alloc) :
-					_comp(comp), _alloc(alloc), _header(0), _count(0)
-			{
-
-			};
-
-			rb_tree(const rb_tree& tree) : _alloc(tree._alloc), _comp(tree), _count(tree._count)
+			rb_tree(const rb_tree& tree) : _comp(tree._comp), _count(tree._count), _palloc(tree._palloc)
 			{
 
 			};
@@ -798,15 +822,19 @@ namespace ft
 
 			iterator	insert(value_type val)
 			{
+				link_type	node;
+
 				if (this->_header == 0)
 				{
 					this->_header = this->createNode(val);
-					this->_header->right = this->_alloc.allocate(1);
+					this->_header->right = this->_nalloc.allocate(1);
+					this->_palloc.construct(&this->_header->right->value, ft::pair<typename T::first_type, typename T::second_type>());
 					this->_header->right->parent = this->_header;
 					this->_header->right->right = 0;
 					this->_header->right->left = 0;
 					this->_header->color = black;
 					this->_count++;
+					node = this->_header;
 				}
 				else
 				{
@@ -814,24 +842,24 @@ namespace ft
 					dummy_r = this->_header;
 					while (dummy_r->right && dummy_r->right->right)
 						dummy_r = dummy_r->right;
-					this->_alloc.deallocate(dummy_r->right, 1);
+					this->_nalloc.deallocate(dummy_r->right, 1);
 					dummy_r->right = 0;
-					insert_and_rebalance(val);
+					node = insert_and_rebalance(val);
 					handle_dummy_r();
 				}
-				return (iterator(this->_header));
+				return (iterator(node));
 			};
 
 			difference_type		erase(value_type val)
 			{
 				link_type	v = find(val);
-				if (v != 0)
+				if (v != 0 && v != this->end())
 				{
 					link_type	dummy_r;
 					dummy_r = this->_header;
 					while (dummy_r->right && dummy_r->right->right)
 						dummy_r = dummy_r->right;
-					this->_alloc.deallocate(dummy_r->right, 1);
+					this->_nalloc.deallocate(dummy_r->right, 1);
 					dummy_r->right = 0;
 					handle_erase(v);
 					if (this->_header != 0)
@@ -839,6 +867,35 @@ namespace ft
 					return (true);
 				}
 				return false;
+			}
+
+			void		erase(iterator first, iterator last)
+			{
+				difference_type	last_dec;
+				difference_type	is_end;
+				value_type		end;
+				
+				last_dec = false;
+				is_end = false;
+				if (last == iterator(this->end()))
+					is_end = true;
+				else
+					this->_palloc.construct(&end,*last);
+				while (first != last)
+				{
+					link_type	temp = find(*first);
+					if (temp != this->begin())
+						first++;
+					else
+						last_dec = true;
+					if (temp == 0)
+						break; 
+					handle_erase(temp);
+					if (is_end)
+						last = iterator(this->end());
+					else if (last_dec)
+						last = iterator(find(end));
+				}
 			}
 
 			link_type		getHeader()
@@ -914,18 +971,32 @@ namespace ft
 
 			size_type		max_size()	const
 			{
-				return (this->_alloc->max_size());
+				return (this->_nalloc->max_size());
 			};
 
-			link_type		find(value_type &val)
+			size_type		count(value_type val)	const
+			{
+				if (this->_header != 0)
+				{
+					iterator 	it = iterator(this->_header);
+					while (it != iterator(this->end()) && (*it).first != val.first)
+						it++;
+					if ((*it).first == val.first && it != iterator(this->end()))
+						return (1);
+				}
+				return (0);
+			};
+
+			link_type		find(value_type val)
 			{
 				link_type	tmp = this->_header;
+
 				while (tmp != 0)
 				{
 					if (val.first < tmp->value.first)
 					{
 						if (tmp->left == 0)
-							break;
+							tmp = 0;
 						else
 							tmp = tmp->left;
 					}
@@ -934,16 +1005,17 @@ namespace ft
 					else
 					{
 						if (tmp->right == 0)
-							break;
+							tmp = 0;
 						else
 							tmp = tmp->right;
 					}
 				}
+				if (tmp == 0)
+					return (this->end());
 				return (tmp);
 			}
 
-
-			link_type		find(value_type &val)	const
+			link_type		find(value_type val)	const
 			{
 				link_type	tmp = this->_header;
 				while (tmp != 0)
@@ -951,7 +1023,7 @@ namespace ft
 					if (val.first < tmp->value.first)
 					{
 						if (tmp->left == 0)
-							break;
+							tmp = 0;
 						else
 							tmp = tmp->left;
 					}
@@ -960,11 +1032,13 @@ namespace ft
 					else
 					{
 						if (tmp->right == 0)
-							break;
+							tmp = 0;
 						else
 							tmp = tmp->right;
 					}
 				}
+				if (tmp == 0)
+					return (this->end());
 				return (tmp);
 			}
 //ALL CONTENT HERE IS COPIED FOR TESTS

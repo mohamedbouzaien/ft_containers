@@ -6,7 +6,7 @@
 /*   By: mbouzaie <mbouzaie@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/19 11:48:08 by mbouzaie          #+#    #+#             */
-/*   Updated: 2021/09/30 00:15:58 by mbouzaie         ###   ########.fr       */
+/*   Updated: 2021/11/03 16:15:27 by mbouzaie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,7 +98,6 @@ namespace ft
 
 			virtual ~vector()
 			{
-				//return later
 				this->clear();
 				_alloc.deallocate(this->_front, this->capacity());
 			};
