@@ -6,7 +6,7 @@
 /*   By: mbouzaie <mbouzaie@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/05 17:27:11 by mbouzaie          #+#    #+#             */
-/*   Updated: 2021/11/08 17:40:12 by mbouzaie         ###   ########.fr       */
+/*   Updated: 2021/11/11 00:42:17 by mbouzaie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,38 +30,6 @@ namespace ft
 	{
 		typedef			node_base*	pointer;
 		typedef	const	node_base*	const_pointer;
-		rb_color		color;
-		pointer			parent;
-		pointer			left;
-		pointer			right;
-
-		static			pointer	minimum(pointer	node)
-		{
-			while (node->left != 0)
-				node = node->left;
-			return node;
-		};
-
-		static	const_pointer	minimum(const_pointer node)
-		{
-			while (node->left != 0)
-				node = node->left;
-			return node;
-		};
-
-		static			pointer	maximum(pointer	node)
-		{
-			while (node->right != 0)
-				node = node->right;
-			return node;
-		};
-
-		static	const_pointer	maximum(const_pointer node)
-		{
-			while (node->right != 0)
-				node = node->right;
-			return node;
-		};		
 	};
 
 	template<class T>
@@ -390,10 +358,6 @@ namespace ft
 			size_type		_count;
 			node_allocator	_nalloc;
 			allocator_type	_palloc;
-			bool			_left_left;
-			bool			_right_right;
-			bool			_right_left;
-			bool			_left_right;
 
 			link_type	createNode(value_type val)
 			{
@@ -533,10 +497,9 @@ namespace ft
 					if (node->parent->left == 0 || node->parent->left->color == black)
 					{
 						if (node->left != 0 && node->left->color == red)
-							_right_left = true;
+							node->parent = right_left_rotation(node->parent);
 						else if (node->right != 0 && node->right->color == red)
-							_left_left = true;
-				
+							node->parent = left_left_rotation(node->parent);
 					}
 					else
 					{
@@ -551,9 +514,9 @@ namespace ft
 					if (node->parent->right == 0 || node->parent->right->color == black)
 					{
 						if (node->left != 0 && node->left->color == red)
-							_right_right = true;
+							node->parent = right_right_rotation(node->parent);
 						else if (node->right != 0 && node->right->color == red)
-							_left_right = true;
+							node->parent = left_right_rotation(node->parent);
 					}
 					else
 					{
@@ -606,82 +569,8 @@ namespace ft
 				this->_count++;
 				if (header->color == red && header->parent->color == red)
 					handle_double_red_roation(header);
-				if (_left_left)
-				{
-					header->parent = left_left_rotation(header->parent);
-					_left_left = false;
-				}
-				else if (_right_right)
-				{
-					header->parent = right_right_rotation(header->parent);
-					_right_right = false;
-				}
-				else if (_right_left)
-				{
-					header->parent = right_left_rotation(header->parent);
-					_right_left = false;
-				}
-				else if (_left_right)
-				{
-					header->parent = left_right_rotation(header->parent);
-					_left_right = false;
-				}
 				return (header);
 			}
-
-			/*link_type	insert_and_rebalance(link_type header, value_type val)
-			{
-				bool	rotate;
-
-				rotate = false;
-				if (header == 0)
-				{
-					header = this->createNode(val);
-					this->_count++;
-					return (header);
-				}
-				if (val.first > header->value.first)
-				{
-					header->right = insert_and_rebalance(header->right, val);
-					header->right->parent = header;
-					if (header != this->_header)
-						if (header->color == red && header->right->color == red)
-							rotate = true;
-				}
-				else
-				{
-					header->left = insert_and_rebalance(header->left, val);
-					header->left->parent = header;
-					if (header != this->_header)
-						if (header->color == red && header->left->color == red)
-							rotate = true;
-				}
-				if (_left_left)
-				{
-					header = left_left_rotation(header);
-					_left_left = false;
-				}
-				else if (_right_right)
-				{
-					header = right_right_rotation(header);
-					_right_right = false;
-				}
-				else if (_right_left)
-				{
-					header = right_left_rotation(header);
-					_right_left = false;
-				}
-				else if (_left_right)
-				{
-					header = left_right_rotation(header);
-					_left_right = false;
-				}
-				if (rotate)
-				{
-					header =  handle_double_red_roation(header);
-				}
-				return (header);
-			};*/
 
 			void	handle_erase(link_type v)
 			{
@@ -730,6 +619,10 @@ namespace ft
 						this->_palloc.construct(&v->value, u->value);
 						v->left = u->left;
 						v->right = u->right;
+						if (v->left)
+							v->left->parent = v;
+						if (v->right)
+							v->right->parent = v;
 						this->_nalloc.deallocate(u, 1);
 					}
 					else
@@ -769,35 +662,15 @@ namespace ft
 				}
 			};
 		
-			size_type		count_until(value_type val)	const
-			{
-				if (this->_header != 0)
-				{
-					iterator 	it = iterator(this->_header);
-					size_type	count = 0;
-					while (it != iterator(this->end()) && (*it).first != val.first)
-					{
-						it++;
-						count++;
-					}
-					//if ((*it).first == val.first && it == iterator(this->begin()))
-					//	return (1);
-					if ((*it).first == val.first && it != iterator(this->end()))
-						return (count);
-				}
-				return (0);
-			};
-
-		
 		public:
 
-			rb_tree() : _header(0), _count(0), _left_left(false), _right_right(false), _right_left(false), _left_right(false)
+			rb_tree() : _header(0), _count(0)
 			{
 
 			};
 
 			rb_tree(const Compare comp, const allocator_type& alloc = allocator_type()) :
-					_comp(comp), _header(0), _count(0), _palloc(alloc),_left_left(false), _right_right(false), _right_left(false), _left_right(false)
+					_comp(comp), _header(0), _count(0), _palloc(alloc)
 			{
 
 			};
@@ -817,6 +690,10 @@ namespace ft
 				if (this == &tree)
 					return (*this);
 				this->_header = tree._header;
+				this->_comp = tree._comp;
+				this->_count = tree._count;
+				this->_nalloc = tree._nalloc;
+				this->_palloc = tree._palloc;
 				return (*this);
 			};
 
@@ -884,7 +761,7 @@ namespace ft
 				while (first != last)
 				{
 					link_type	temp = find(*first);
-					if (temp != this->begin())
+					if (temp != this->begin() || ((temp == this->begin()) && (temp != this->_header) && temp->is_on_left()))
 						first++;
 					else
 						last_dec = true;
@@ -895,6 +772,11 @@ namespace ft
 						last = iterator(this->end());
 					else if (last_dec)
 						last = iterator(find(end));
+				}
+				if (this->_count == 0 && this->_header != 0)
+				{
+					this->_nalloc.deallocate(this->_header, 1);
+					this->_header = 0;
 				}
 			}
 
@@ -910,8 +792,6 @@ namespace ft
 				tmp = this->_header;
 				if (!tmp || (!(this->_header->right && this->_header->right != this->end()) && !this->_header->left))
 					return (tmp);
-				//if (!this->_header->left && this->_header->right)
-				//	tmp = tmp->right;
 				while (tmp->left)
 					tmp = tmp->left;
 				return (tmp);
@@ -924,8 +804,6 @@ namespace ft
 				tmp = this->_header;
 				if (!tmp || (!(this->_header->right && this->_header->right != this->end()) && !this->_header->left))
 					return (tmp);
-				//if (!this->_header->left && this->_header->right)
-				//	tmp = tmp->right;
 				while (tmp->left)
 					tmp = tmp->left;
 				return (tmp);
@@ -1040,45 +918,6 @@ namespace ft
 				if (tmp == 0)
 					return (this->end());
 				return (tmp);
-			}
-//ALL CONTENT HERE IS COPIED FOR TESTS
-			 // helper function to print inorder traversal
-			void inorderTraversalHelper(link_type n)
-			{
-				if(n != 0)
-				{
-					inorderTraversalHelper(n->left);
-					std::cout << n->value.first;
-					inorderTraversalHelper(n->right);
-				}
-			}
-			//function to print inorder traversal
-			void inorderTraversal()
-			{
-				inorderTraversalHelper(this->_header);
-			}
-			// helper function to print the tree.
-			void printTreeHelper(link_type root, int space)
-			{
-				int i;
-				if(root != 0)
-				{
-					space = space + 10;
-					printTreeHelper(root->right, space);
-					std::cout << std::endl;
-					for ( i = 10; i < space; i++)
-					{
-						std::cout << " ";
-					}
-					std::cout << root->value;
-					std::cout << std::endl;
-					printTreeHelper(root->left, space);
-				}
-			}
-			// function to print the tree.
-			void printTree()
-			{
-				printTreeHelper(this->_header, 4);
 			}
 	};
 };

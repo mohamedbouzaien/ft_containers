@@ -6,7 +6,7 @@
 /*   By: mbouzaie <mbouzaie@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/22 20:57:56 by mbouzaie          #+#    #+#             */
-/*   Updated: 2021/10/19 16:58:45 by mbouzaie         ###   ########.fr       */
+/*   Updated: 2021/11/10 17:17:20 by mbouzaie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -254,7 +254,7 @@ namespace ft
 			};
 
 			template<class U>
-			reverse_iterator(const reverse_iterator<U> &other) : _it(other._it)
+			reverse_iterator(const reverse_iterator<U> &other) : _it(other.base())
 			{
 
 			};

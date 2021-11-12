@@ -6,7 +6,7 @@
 /*   By: mbouzaie <mbouzaie@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/30 18:08:06 by mbouzaie          #+#    #+#             */
-/*   Updated: 2021/11/08 00:12:15 by mbouzaie         ###   ########.fr       */
+/*   Updated: 2021/11/10 16:57:30 by mbouzaie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,22 +122,22 @@ namespace ft
 
 			reverse_iterator			rbegin()
 			{
-				return (reverse_iterator(this->_tree.begin()));
+				return (reverse_iterator(this->end()));
 			};
 
 			const_reverse_iterator		rbegin()					const
 			{
-				return (const_reverse_iterator(this->_tree.begin()));
+				return (const_reverse_iterator(this->end()));
 			};
 
 			reverse_iterator			rend()
 			{
-				return (reverse_iterator(this->_tree.end()));
+				return (reverse_iterator(this->begin()));
 			};
 
 			const_reverse_iterator		rend()						const
 			{
-				return (const_reverse_iterator(this->_tree.end()));				
+				return (const_reverse_iterator(this->begin()));				
 			};
 
 			bool						empty()						const
@@ -155,10 +155,9 @@ namespace ft
 				return (this->_tree.max_size());
 			};
 
-			mapped_type					operator[](const key_type &k)
+			mapped_type&				operator[](const key_type &k)
 			{
-				(void)k;
-				return;
+				return (this->insert(this->begin(), ft::make_pair(k, mapped_type()))->second);
 			};
 
 			ft::pair<iterator, bool>	insert(const value_type &val)
@@ -171,7 +170,9 @@ namespace ft
 
 			iterator					insert(iterator position, const value_type &val)
 			{
-				(void)position;
+				position = this->find(val.first);
+				if (position != this->end())
+					return (position);
 				return (_tree.insert(val));
 			};
 
@@ -200,7 +201,19 @@ namespace ft
 
 			void						swap(map &x)
 			{
-				(void)x;
+				allocator_type					alloc;
+				key_compare						comp;
+				rb_tree<value_type, Compare>	tree;
+				
+				alloc = this->_alloc;
+				this->_alloc = x._alloc;
+				x._alloc = alloc;
+				comp = this->_comp;
+				this->_comp = x._comp;
+				x._comp = comp;
+				tree = this->_tree;
+				this->_tree = x._tree;
+				x._tree = tree;
 			};
 
 			void						clear()
@@ -210,12 +223,12 @@ namespace ft
 
 			key_compare					key_comp()						const
 			{
-				return;
+				return (this->_comp);
 			};
 
 			value_compare				value_comp()					const
 			{
-				return;
+				return (value_compare(this->_comp));
 			};
 
 			iterator					find(const key_type &k)
@@ -235,84 +248,70 @@ namespace ft
 
 			iterator					lower_bound(const key_type &k)
 			{
-				(void)k;
-				return;
+				iterator	it = this->begin();
+
+				while (it != this->end())
+				{
+					if (!this->_comp(it->first, k))
+						break;
+					it++;
+				}
+				return (it);
 			};
 
 			const_iterator				lower_bound(const key_type &k)	const
 			{
-				(void)k;
-				return;
+				const_iterator	it = this->begin();
+
+				while (it != this->end())
+				{
+					if (!this->_comp(it->first, k))
+						break;
+					it++;
+				}
+				return (it);
 			};
 
 			iterator					upper_bound(const key_type &k)
 			{
-				(void)k;
-				return;
+				iterator	it = this->begin();
+
+				while (it != this->end())
+				{
+					if (this->_comp(k, it->first))
+						break;
+					++it;
+				}
+				return (it);
 			};
 
 			const_iterator				upper_bound(const key_type &k)	const
 			{
-				(void)k;
-				return;
+				const_iterator	it = this->begin();
+
+				while (it != this->end())
+				{
+					if (this->_comp(k, it->first))
+						break;
+					++it;
+				}
+				return (it);
 			};
 
 			pair<const_iterator, const_iterator>	equal_range(const key_type &k)	const
 			{
-				(void)k;
-				return;
+				return (ft::make_pair(this->lower_bound(k), this->upper_bound(k)));
 			};
 
 			pair<iterator, iterator>		equal_range(const key_type &k)
 			{
-				(void)k;
-				return;
+				return (ft::make_pair(this->lower_bound(k), this->upper_bound(k)));
 			};
 
 			allocator_type				get_allocator()					const
 			{
 				return (this->_alloc);
 			};
-
-			//FOR TEST PURPOSES ONLY
-			void inorderTraversalHelper(node<value_type> *n)
-			{
-				if(n != 0)
-				{
-					inorderTraversalHelper(n->left);
-					std::cout << n->value.first;
-					inorderTraversalHelper(n->right);
-				}
-			}
-			//function to print inorder traversal
-			void inorderTraversal()
-			{
-				inorderTraversalHelper(this->_tree.getHeader());
-			}
-
-						// helper function to print the tree.
-			void printTreeHelper(node<value_type> *root, int space)
-			{
-				int i;
-				if(root != 0)
-				{
-					space = space + 10;
-					printTreeHelper(root->right, space);
-					std::cout << std::endl;
-					for ( i = 10; i < space; i++)
-					{
-						std::cout << " ";
-					}
-					std::cout << root->value.first;
-					std::cout << std::endl;
-					printTreeHelper(root->left, space);
-				}
-			}
-			// function to print the tree.
-			void printTree()
-			{
-				printTreeHelper(this->_tree.getHeader(), 4);
-			}
 	};
 };
 
