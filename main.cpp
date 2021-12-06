@@ -6,83 +6,24 @@
 /*   By: mbouzaie <mbouzaie@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/09 12:46:15 by mbouzaie          #+#    #+#             */
-/*   Updated: 2021/11/21 16:51:29 by mbouzaie         ###   ########.fr       */
+/*   Updated: 2021/12/06 20:39:50 by mbouzaie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "incs/vector.hpp"
-#include "incs/map.hpp"
-#include <iostream>
-#include <vector>
-#include <map>
-#include <ctime>
-#include <cstdlib>
-
-template <typename T>
-void    print_vector(T& cont)
-{
-	for (typename T::const_iterator it = cont.begin(); it != cont.end(); ++it)
-		std::cout << "[" << *it << "] | ";
-	std::cout << std::endl;
-}
-
-template <class Container, class T>
-void vect_push_back_one_element(Container c, T toInsert)
-{
-	std::cout << "push_back one element:" << toInsert << std::endl;
-	int start_s = clock();
-	c.push_back(toInsert);
-	int stop_s = clock();
-	std::cout << "vector content : " << std::endl;
-	print_vector(c);
-	std::cout << "execution time: " << (stop_s - start_s) / double(CLOCKS_PER_SEC) * 1000 << "ms" << std::endl;
-}
-
-template <class Container>
-void vect_push_back_many_elements_int(Container c, int number)
-{
-	std::cout << "push_back " << number << " elements" << std::endl;
-	int start_s = clock();
-	for (int i = 0; i < number; i++)
-		c.push_back(rand() % 1000);
-	int stop_s = clock();
-	std::cout << "size after push_back: " << c.size() << std::endl;
-	std::cout << "execution time: " << (stop_s - start_s) / double(CLOCKS_PER_SEC) * 1000 << "ms" << std::endl;
-}
-
-template <class Container>
-void vect_pop_back_one_element(Container c)
-{
-	std::cout << "pop_back one element" << std::endl;
-	c.push_back(42);
-	c.push_back(10);
-	std::cout << "vector content before pop_back : " << std::endl;
-	print_vector(c);
-	int start_s = clock();
-	c.pop_back();
-	int stop_s = clock();
-	std::cout << "vector content after pop_back: " << std::endl;
-	print_vector(c);
-	std::cout << "execution time: " << (stop_s - start_s) / double(CLOCKS_PER_SEC) * 1000 << "ms" << std::endl;
-}
-
-void	insert_one_elem_int()
-{
-	
-}
+# include "incs/vector_tests.hpp"
 
 template <typename T>
 void    print_map(T& cont)
 {
-	for (typename T::const_iterator it = cont.beg in(); it != cont.end(); ++it)
+	for (typename T::const_iterator it = cont.begin(); it != cont.end(); ++it)
 		std::cout << "[" << it->first << "][" << it->second << "] | ";
 	std::cout << std::endl;
 }
 
-void    vectors_test_int()
+void	vectors_test_int()
 {
-	std::vector<int>    std_vector;
-	ft::vector<int>     ft_vector;
+	std::vector<int>	std_vector;
+	ft::vector<int>		ft_vector;
 	std::cout << "--------------------VECTORS TEST---------------------" << std::endl;
 
 	std::cout << "+++++++++++++++++++++++STD+++++++++++++++++++++++++++" << std::endl;
@@ -98,9 +39,69 @@ void    vectors_test_int()
 	std::cout << "+++++++++++++++++++++++FT++++++++++++++++++++++++++++" << std::endl;
 	vect_push_back_many_elements_int<ft::vector<int> >(ft_vector, 100000);
 	std::cout << "+++++++++++++++++++++++STD+++++++++++++++++++++++++++" << std::endl;
-	vect_pop_back_one_element<std::vector<int> >(std_vector);
+	vect_pop_back_one_element_int<std::vector<int> >(std_vector);
 	std::cout << "+++++++++++++++++++++++FT++++++++++++++++++++++++++++" << std::endl;
-	vect_pop_back_one_element<ft::vector<int> >(ft_vector);
+	vect_pop_back_one_element_int<ft::vector<int> >(ft_vector);
+	std::cout << "+++++++++++++++++++++++STD+++++++++++++++++++++++++++" << std::endl;
+	vect_insert_one_elem_int<std::vector<int> >(std_vector);
+	std::cout << "+++++++++++++++++++++++FT++++++++++++++++++++++++++++" << std::endl;
+	vect_insert_one_elem_int<ft::vector<int> >(ft_vector);
+	std::cout << "+++++++++++++++++++++++STD+++++++++++++++++++++++++++" << std::endl;
+	vect_insert_many_elems_int<std::vector<int> >(std_vector);
+	std::cout << "+++++++++++++++++++++++FT++++++++++++++++++++++++++++" << std::endl;
+	vect_insert_many_elems_int<ft::vector<int> >(ft_vector);
+	std::cout << "+++++++++++++++++++++++STD+++++++++++++++++++++++++++" << std::endl;
+	vect_insert_range_int<std::vector<int> >(std_vector);
+	std::cout << "+++++++++++++++++++++++FT++++++++++++++++++++++++++++" << std::endl;
+	vect_insert_range_int<ft::vector<int> >(ft_vector);
+	std::cout << "+++++++++++++++++++++++STD+++++++++++++++++++++++++++" << std::endl;
+	vect_erase_one_elem_int<std::vector<int> >(std_vector);
+	std::cout << "+++++++++++++++++++++++FT++++++++++++++++++++++++++++" << std::endl;
+	vect_erase_one_elem_int<ft::vector<int> >(ft_vector);
+	std::cout << "+++++++++++++++++++++++STD+++++++++++++++++++++++++++" << std::endl;
+	vect_reverse_iterators_and_bracks<std::vector<int> >(std_vector);
+	std::cout << "+++++++++++++++++++++++FT++++++++++++++++++++++++++++" << std::endl;
+	vect_reverse_iterators_and_bracks<ft::vector<int> >(ft_vector);
+}
+
+void	vectors_test_str()
+{
+	std::vector<std::string>	std_vector;
+	ft::vector<std::string>		ft_vector;
+	std::cout << "--------------------VECTORS TEST---------------------" << std::endl;
+
+	std::cout << "+++++++++++++++++++++++STD+++++++++++++++++++++++++++" << std::endl;
+	vect_push_back_one_element<std::vector<std::string>, std::string>(std_vector, "Hello");
+	std::cout << "+++++++++++++++++++++++FT++++++++++++++++++++++++++++" << std::endl;
+	vect_push_back_one_element<ft::vector<std::string>, std::string>(ft_vector, "Hello world");
+	std::cout << "+++++++++++++++++++++++STD+++++++++++++++++++++++++++" << std::endl;
+	vect_push_back_many_elements_str<std::vector<std::string> >(std_vector, 1000);
+	std::cout << "+++++++++++++++++++++++FT++++++++++++++++++++++++++++" << std::endl;
+	vect_push_back_many_elements_str<ft::vector<std::string> >(ft_vector, 1000);
+	std::cout << "+++++++++++++++++++++++STD+++++++++++++++++++++++++++" << std::endl;
+	vect_push_back_many_elements_str<std::vector<std::string> >(std_vector, 100000);
+	std::cout << "+++++++++++++++++++++++FT++++++++++++++++++++++++++++" << std::endl;
+	vect_push_back_many_elements_str<ft::vector<std::string> >(ft_vector, 100000);
+	std::cout << "+++++++++++++++++++++++STD+++++++++++++++++++++++++++" << std::endl;
+	vect_pop_back_one_element_str<std::vector<std::string> >(std_vector);
+	std::cout << "+++++++++++++++++++++++FT++++++++++++++++++++++++++++" << std::endl;
+	vect_pop_back_one_element_str<ft::vector<std::string> >(ft_vector);
+	std::cout << "+++++++++++++++++++++++STD+++++++++++++++++++++++++++" << std::endl;
+	vect_insert_one_elem_str<std::vector<std::string> >(std_vector);
+	std::cout << "+++++++++++++++++++++++FT++++++++++++++++++++++++++++" << std::endl;
+	vect_insert_one_elem_str<ft::vector<std::string> >(ft_vector);
+	std::cout << "+++++++++++++++++++++++STD+++++++++++++++++++++++++++" << std::endl;
+	vect_insert_many_elems_str<std::vector<std::string> >(std_vector);
+	std::cout << "+++++++++++++++++++++++FT++++++++++++++++++++++++++++" << std::endl;
+	vect_insert_many_elems_str<ft::vector<std::string> >(ft_vector);
+	std::cout << "+++++++++++++++++++++++STD+++++++++++++++++++++++++++" << std::endl;
+	vect_insert_range_str<std::vector<std::string> >(std_vector);
+	std::cout << "+++++++++++++++++++++++FT++++++++++++++++++++++++++++" << std::endl;
+	vect_insert_range_str<ft::vector<std::string> >(ft_vector);
+	std::cout << "+++++++++++++++++++++++STD+++++++++++++++++++++++++++" << std::endl;
+	vect_erase_one_elem_str<std::vector<std::string> >(std_vector);
+	std::cout << "+++++++++++++++++++++++FT++++++++++++++++++++++++++++" << std::endl;
+	vect_erase_one_elem_str<ft::vector<std::string> >(ft_vector);
 }
 
 int     main()
@@ -111,7 +112,6 @@ int     main()
 	srand((unsigned int)time(0));
 	std::cout << "================FT_CONTAINERS TESTER=================" << std::endl;
 	vectors_test_int();
-
-
+	vectors_test_str();
 	return (0);
 }
