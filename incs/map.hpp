@@ -6,7 +6,7 @@
 /*   By: mbouzaie <mbouzaie@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/30 18:08:06 by mbouzaie          #+#    #+#             */
-/*   Updated: 2021/11/10 16:57:30 by mbouzaie         ###   ########.fr       */
+/*   Updated: 2021/11/14 20:11:52 by mbouzaie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,7 @@ namespace ft
 			
 			~map()
 			{
-				//this->clear();
+				this->clear();
 			};
 			
 			map							&operator=(const map &x)
@@ -196,7 +196,12 @@ namespace ft
 
 			void						erase(iterator first, iterator last)
 			{
-				this->_tree.erase(first, last);
+				while (first != last)
+				{
+					iterator	temp(first);
+					first++;
+					this->erase(temp);
+				}
 			};
 
 			void						swap(map &x)

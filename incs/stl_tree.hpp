@@ -6,7 +6,7 @@
 /*   By: mbouzaie <mbouzaie@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/05 17:27:11 by mbouzaie          #+#    #+#             */
-/*   Updated: 2021/11/11 00:42:17 by mbouzaie         ###   ########.fr       */
+/*   Updated: 2021/11/14 19:43:54 by mbouzaie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -615,15 +615,9 @@ namespace ft
 				{
 					if (v == this->_header)
 					{
-						this->_palloc.destroy(&v->value);
-						this->_palloc.construct(&v->value, u->value);
-						v->left = u->left;
-						v->right = u->right;
-						if (v->left)
-							v->left->parent = v;
-						if (v->right)
-							v->right->parent = v;
-						this->_nalloc.deallocate(u, 1);
+						this->_nalloc.deallocate(v, 1);
+						this->_header = u;
+						this->_header->parent = 0;
 					}
 					else
 					{
@@ -661,6 +655,27 @@ namespace ft
 					tmp->right->left = 0;
 				}
 			};
+
+			void		delete_dummy()
+			{
+				if (this->_header != 0)
+				{
+					link_type	dummy_r;
+					dummy_r = this->_header;
+					while (dummy_r->right && dummy_r->right->right)
+						dummy_r = dummy_r->right;
+					if (this->_header == dummy_r && !(dummy_r->right))
+					{
+						this->_header = 0;
+						this->_nalloc.deallocate(dummy_r, 1);
+					}
+					else
+					{
+						this->_nalloc.deallocate(dummy_r->right, 1);
+						dummy_r->right = 0;
+					}
+				}
+			}
 		
 		public:
 
@@ -715,12 +730,7 @@ namespace ft
 				}
 				else
 				{
-					link_type	dummy_r;
-					dummy_r = this->_header;
-					while (dummy_r->right && dummy_r->right->right)
-						dummy_r = dummy_r->right;
-					this->_nalloc.deallocate(dummy_r->right, 1);
-					dummy_r->right = 0;
+					delete_dummy();
 					node = insert_and_rebalance(val);
 					handle_dummy_r();
 				}
@@ -732,58 +742,13 @@ namespace ft
 				link_type	v = find(val);
 				if (v != 0 && v != this->end())
 				{
-					link_type	dummy_r;
-					dummy_r = this->_header;
-					while (dummy_r->right && dummy_r->right->right)
-						dummy_r = dummy_r->right;
-					this->_nalloc.deallocate(dummy_r->right, 1);
-					dummy_r->right = 0;
 					handle_erase(v);
-					if (this->_header != 0)
-						handle_dummy_r();
+					if (!this->size())
+						this->delete_dummy();
 					return (true);
 				}
 				return false;
 			}
-
-			void		erase(iterator first, iterator last)
-			{
-				difference_type	last_dec;
-				difference_type	is_end;
-				value_type		end;
-				
-				last_dec = false;
-				is_end = false;
-				if (last == iterator(this->end()))
-					is_end = true;
-				else
-					this->_palloc.construct(&end,*last);
-				while (first != last)
-				{
-					link_type	temp = find(*first);
-					if (temp != this->begin() || ((temp == this->begin()) && (temp != this->_header) && temp->is_on_left()))
-						first++;
-					else
-						last_dec = true;
-					if (temp == 0)
-						break; 
-					handle_erase(temp);
-					if (is_end)
-						last = iterator(this->end());
-					else if (last_dec)
-						last = iterator(find(end));
-				}
-				if (this->_count == 0 && this->_header != 0)
-				{
-					this->_nalloc.deallocate(this->_header, 1);
-					this->_header = 0;
-				}
-			}
-
-			link_type		getHeader()
-			{
-				return (this->_header);
-			};
 
 			link_type		begin()
 			{
