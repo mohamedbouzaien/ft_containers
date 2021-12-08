@@ -6,7 +6,7 @@
 /*   By: mbouzaie <mbouzaie@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 20:14:56 by mbouzaie          #+#    #+#             */
-/*   Updated: 2021/12/06 21:09:00 by mbouzaie         ###   ########.fr       */
+/*   Updated: 2021/12/08 18:41:13 by mbouzaie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,8 @@
 # define VECTOR_TESTS_HPP
 
 #include "vector.hpp"
-#include "map.hpp"
 #include <iostream>
 #include <vector>
-#include <map>
 #include <ctime>
 #include <cstdlib>
 
@@ -427,7 +425,7 @@ void	vect_erase_one_elem_int(Container c)
 	c.push_back(42);
 	c.push_back(-20);
 	c.push_back(101);
-	std::cout << "Vector elements before insert:" << std::endl;
+	std::cout << "Vector elements before erase:" << std::endl;
 	print_vector(c);
 	Container tmp = c;
 	std::cout << "Erase one element in the beginning:" << std::endl;
@@ -462,6 +460,40 @@ void	vect_reverse_iterators_and_bracks(Container c)
 	for (typename Container::size_type i = 0; i < c.size(); i++)
 		std::cout << c[i] << " |";
 	std:: cout << std::endl;
+}
+
+template <class Container>
+void	vector_non_member_operators(Container c)
+{
+	c.push_back(10);
+	c.push_back(42);
+	c.push_back(44);
+	Container	tmp = c;
+	
+	std::cout << "Test when container 1 == container 2" << std::endl;
+	std::cout << "container 1 != container 2 : " << (c != tmp) << std::endl;
+	std::cout << "container 1 == container 2 : " << (c == tmp) << std::endl;
+	std::cout << "container 1 <= container 2 : " << (c <= tmp) << std::endl;
+	std::cout << "container 1 < container 2 : " << (c < tmp) << std::endl;
+	std::cout << "container 1 >= container 2 : " << (c >= tmp) << std::endl;
+	std::cout << "container 1 > container 2 : " << (c > tmp) << std::endl;
+	c.push_back(2);
+	std::cout << "Test when container 1 > container 2" << std::endl;
+	std::cout << "container 1 != container 2 : " << (c != tmp) << std::endl;
+	std::cout << "container 1 == container 2 : " << (c == tmp) << std::endl;
+	std::cout << "container 1 <= container 2 : " << (c <= tmp) << std::endl;
+	std::cout << "container 1 < container 2 : " << (c < tmp) << std::endl;
+	std::cout << "container 1 >= container 2 : " << (c >= tmp) << std::endl;
+	std::cout << "container 1 > container 2 : " << (c > tmp) << std::endl;
+	c.pop_back();
+	c.pop_back();
+	std::cout << "Test when container 1 < container 2" << std::endl;
+	std::cout << "container 1 != container 2 : " << (c != tmp) << std::endl;
+	std::cout << "container 1 == container 2 : " << (c == tmp) << std::endl;
+	std::cout << "container 1 <= container 2 : " << (c <= tmp) << std::endl;
+	std::cout << "container 1 < container 2 : " << (c < tmp) << std::endl;
+	std::cout << "container 1 >= container 2 : " << (c >= tmp) << std::endl;
+	std::cout << "container 1 > container 2 : " << (c > tmp) << std::endl;
 }
 
 #endif
