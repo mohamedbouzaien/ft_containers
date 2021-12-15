@@ -6,7 +6,7 @@
 /*   By: mbouzaie <mbouzaie@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/05 17:27:11 by mbouzaie          #+#    #+#             */
-/*   Updated: 2021/12/15 01:21:05 by mbouzaie         ###   ########.fr       */
+/*   Updated: 2021/12/15 21:39:54 by mbouzaie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -398,6 +398,13 @@ namespace ft
 				x->right = node;
 				node->left = y;
 				x->parent = node->parent;
+				if (node->parent)
+				{				
+					if (node->is_on_left())
+						node->parent->left = x;
+					else
+						node->parent->right = x;
+				}
 				node->parent = x;
 				if (y != 0)
 					y->parent = node;
@@ -605,9 +612,15 @@ namespace ft
 								v->sibling()->color = red;
 						}
 						if (v->is_on_left())
-							parent->left = 0;
+						{
+							v->parent->left = v->right;
+							if (v->parent != parent)
+								parent->parent = v->parent;
+						}
 						else if (v->parent != 0)
-							parent->right = 0;
+						{
+							v->parent->right = v->right;
+						}
 					}
 					this->_nalloc.deallocate(v, 1);
 					this->_count--;
@@ -627,9 +640,10 @@ namespace ft
 							parent->left = u;
 						else
 							parent->right = u;
+						rb_color	c = v->color;
 						this->_nalloc.deallocate(v, 1);
 						u->parent = parent;
-						if ((u == 0 || u->color == black) && (v->color == black))
+						if ((u == 0 || u->color == black) && (c == black))
 							handle_double_black_rotation(u);
 						else
 							u->color = black;

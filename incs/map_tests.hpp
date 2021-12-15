@@ -6,7 +6,7 @@
 /*   By: mbouzaie <mbouzaie@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/08 18:50:10 by mbouzaie          #+#    #+#             */
-/*   Updated: 2021/12/08 22:21:07 by mbouzaie         ###   ########.fr       */
+/*   Updated: 2021/12/15 21:54:59 by mbouzaie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -205,6 +205,10 @@ void	map_reverse_iterators_and_bracks(Container c)
 	std:: cout << std::endl;
 	std::cout << "Showing content using brackets: " << std::endl;
 	std::cout << "[" << c[2] << "] | " << std::endl;
+	std::cout << "Showing unknown content (3) using brackets: " << std::endl;
+	std::cout << "[" << c[3] << "] | " << std::endl;
+	std::cout << "map elements after that" << std::endl;
+	print_map(c); 
 }
 
 #endif
