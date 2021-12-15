@@ -6,7 +6,7 @@
 /*   By: mbouzaie <mbouzaie@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/05 17:27:11 by mbouzaie          #+#    #+#             */
-/*   Updated: 2021/12/08 22:13:33 by mbouzaie         ###   ########.fr       */
+/*   Updated: 2021/12/15 01:21:05 by mbouzaie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ namespace ft
 
  		bool	is_on_left()
 		{
-			 return this == parent->left;
+			 return (this->parent && this == parent->left);
 		};
 
 		node*	sibling()
@@ -378,9 +378,10 @@ namespace ft
 				link_type	y;
 
 				x = node->right;
-				y = node->left;
+				y = x->left;
 				x->left = node;
 				node->right = y;
+				x->parent = node->parent;
 				node->parent = x;
 				if (y != 0)
 					y->parent = node;
@@ -396,6 +397,7 @@ namespace ft
 				y = x->right;
 				x->right = node;
 				node->left = y;
+				x->parent = node->parent;
 				node->parent = x;
 				if (y != 0)
 					y->parent = node;
@@ -604,7 +606,7 @@ namespace ft
 						}
 						if (v->is_on_left())
 							parent->left = 0;
-						else
+						else if (v->parent != 0)
 							parent->right = 0;
 					}
 					this->_nalloc.deallocate(v, 1);
